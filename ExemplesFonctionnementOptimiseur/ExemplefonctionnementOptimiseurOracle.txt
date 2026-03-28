@@ -1,0 +1,166 @@
+SELECT * FROM EMP WHERE ENAME='Adams'; 3 secondes
+
+
+SELECT * FROM EMP WHERE ENAME=‘'Martin';10 secondes
+
+select empno, ename from r_employes where ename='BOUMLID';
+
+id 			operation			object_name 	
+
+1			table acces full	r_employes
+
+--------------------------------------------------------------------------------
+| Id  | Operation         | Name       | Rows  | Bytes | Cost (%CPU)| Time     |
+--------------------------------------------------------------------------------
+|   0 | SELECT STATEMENT  |            |     1 |    22 |     3   (0)| 00:00:01 |
+|*  1 |  TABLE ACCESS FULL| R_EMPLOYES |     1 |    22 |     3   (0)| 00:00:01 |
+--------------------------------------------------------------------------------
+
+Predicate Information (identified by operation id):
+---------------------------------------------------
+
+   1 - filter("ENAME"='BOUMLID')
+   
+create index idx_r_employes_ename on r_employes(ename);
+
+execute dbms_stats.gather_schema_stats('PDBADMIN');
+select empno, ename from r_employes where ename='BOUMLID';
+
+--------------------------------------------------------------------------------
+| Id  | Operation         | Name       | Rows  | Bytes | Cost (%CPU)| Time     |
+--------------------------------------------------------------------------------
+|   0 | SELECT STATEMENT  |            |     1 |    22 |     3   (0)| 00:00:01 |
+|*  1 |  TABLE ACCESS FULL| R_EMPLOYES |     1 |    22 |     3   (0)| 00:00:01 |
+--------------------------------------------------------------------------------
+
+select empno, ename from r_employes where ename='BOUMLID';
+--------------------------------------------------------------------------------
+| Id  | Operation         				| Name       			| Rows  | Bytes | Cost (%CPU)| Time     |
+--------------------------------------------------------------------------------
+|   0 | SELECT STATEMENT  				|          				|     1 |    22 |     4  (0)| 00:00:01 |
+|*  1 |  TABLE ACCESS BY INDEX ROWID	| R_EMPLOYES 			|     1	|    22 |     ?   (0)| 00:00:01 |
+|*  2 |  	INDEX RANGE SCAN 			| idx_r_employes_ename 	|     1 |    22 |     ?   (0)| 00:00:01 |
+--------------------------------------------------------------------------------
+select empno, ename from r_employes where ename='BOUMLID';
+
+------------------------------------------------------------------------------------------------------------
+| Id  | Operation                           | Name                 | Rows  | Bytes | Cost (%CPU)| Time     |
+------------------------------------------------------------------------------------------------------------
+|   0 | SELECT STATEMENT                    |                      |     1 |    10 |     2   (0)| 00:00:01 |
+|   1 |  TABLE ACCESS BY INDEX ROWID BATCHED| R_EMPLOYES           |     1 |    10 |     2   (0)| 00:00:01 |
+|*  2 |   INDEX RANGE SCAN                  | IDX_R_EMPLOYES_ENAME |     1 |       |     1   (0)| 00:00:01 |
+------------------------------------------------------------------------------------------------------------
+select /*+FULL(r_employes)*/ empno, ename from r_employes where ename='BOUMLID';
+
+--------------------------------------------------------------------------------
+| Id  | Operation         | Name       | Rows  | Bytes | Cost (%CPU)| Time     |
+--------------------------------------------------------------------------------
+|   0 | SELECT STATEMENT  |            |     1 |    10 |     3   (0)| 00:00:01 |
+|*  1 |  TABLE ACCESS FULL| R_EMPLOYES |     1 |    10 |     3   (0)| 00:00:01 |
+--------------------------------------------------------------------------------
+
+select /*+INDEX(r_employes IDX_R_EMPLOYES_ENAME)*/ empno, ename from r_employes where ename='BOUMLID';
+
+
+select empno, ename from r_employes1 where ename='BOUMLID';
+
+1. Parse
+
+1.1 analyse syntaxique
+
+1.2 analyse semantique
+vérifier les objets : les tables, les colonnes, etc. si elles existent
+
+1.3 shared pool check ?
+vérifie s'il n' y a un "Plan d’exécution" qui existe déja dans la sql area ou shared ou zone des requêtes
+Si le plan existe 
+	=> fait soft parse: et va à l'étape EXECUTION
+
+Si le plan n'existe pas ?
+	=> il fait l'optimisation
+		select empno, ename from r_employes1 where ename='BOUMLID' and empno>10 and sal=10000;
+		
+		Déterminer les chemins d'accès valides
+			chemin1 : passer par l'index sur la colonne ename
+			Chemin2 : lire toutes les lignes
+			chemin3 : passer par l'index sur la colonne empno
+			chemin4 : passer par l'index sur la colonne salaire
+
+		select empno, ename from r_employes1 where ename='BOUMLID';
+		
+		Déterminer les chemins d'accès valides
+			chemin1 : passer par l'index sur la colonne ename
+			Chemin2 : lire toutes les lignes
+
+	Déterminer les cheminset calcule le cout de chacun
+			select empno, ename from r_employes1 where ename='BOUMLID';
+			chemin1 : passer par l'index sur la colonne ename : cout => 2 => plan1 (1/4, 0,25*4=1), 10ms
+			Chemin2 : lire toutes les lignes : cout => 3 => plan 2
+
+	Choisir le meilleurs plan pour la requête
+			select empno, ename from r_employes1 where ename='BOUMLID';
+			ici ce sera : le plan 1
+			
+------------------------------------------------------------------------------------------------------------
+| Id  | Operation                           | Name                 | Rows  | Bytes | Cost (%CPU)| Time     |
+------------------------------------------------------------------------------------------------------------
+|   0 | SELECT STATEMENT                    |                      |     1 |    10 |     2   (0)| 00:00:01 |
+|   1 |  TABLE ACCESS BY INDEX ROWID BATCHED| R_EMPLOYES           |     1 |    10 |     2   (0)| 00:00:01 |
+|*  2 |   INDEX RANGE SCAN                  | IDX_R_EMPLOYES_ENAME |     1 |       |     1   (0)| 00:00:01 |
+------------------------------------------------------------------------------------------------------------
+
+
+2. Execute
+	execution du plan 1
+tente de charger les lignes ou ename='BOUMLID'
+via les rowid:
+TABLE ACCESS BY INDEX ROWID BATCHED| R_EMPLOYES
+il n'a pas les rowid
+Empile l'étape 1
+
+descend à l'étape 2
+on parcours l'index selon l'algo de dichotomie
+jusqu'à trouver Boumlid
+on récupère le rowid ou les rowid stocké à coté de Boumlid
+ces rowid pointent vers la ou les lignes contenant Boumlid
+
+depile et remonte a l'étape1
+charge la ligne ou les lignes graces aux rowid récupérés dans l'index
+en mode mono bloc
+s'il N rowid
+loop
+	read(rowid i)
+	i++
+end;
+
+
+3. Fetch
+charge les lignes qui matchent et le client les voit
+
+		select empno, ename from r_employes1 where ename='BOUMLID';
+EMPNO ENAME
+---------- ---------------
+2 BOUMLID		
+------------------------------------------------------------------------------------------------------------
+| Id  | Operation                           | Name                 | Rows  | Bytes | Cost (%CPU)| Time     |
+------------------------------------------------------------------------------------------------------------
+|   0 | SELECT STATEMENT                    |                      |     1 |    10 |     2   (0)| 00:00:01 |
+|   1 |  TABLE ACCESS BY INDEX ROWID BATCHED| R_EMPLOYES           |     1 |    10 |     2   (0)| 00:00:01 |
+|*  2 |   INDEX RANGE SCAN                  | IDX_R_EMPLOYES_ENAME |     1 |       |     1   (0)| 00:00:01 |
+------------------------------------------------------------------------------------------------------------
+ 2 - access("ENAME"='BOUMLID')
+ 
+ 
+ select ename from r_employes1 where ename>'BOUMLID';
+ 
+ENAME
+---------------
+BOUMLID
+		
+-----------------------------------------------------------------------------------------
+| Id  | Operation        | Name                 | Rows  | Bytes | Cost (%CPU)| Time     |
+-----------------------------------------------------------------------------------------
+|   0 | SELECT STATEMENT |                      |     1 |     7 |     1   (0)| 00:00:01 |
+|*  1 |  INDEX RANGE SCAN| IDX_R_EMPLOYES_ENAME |     1 |     7 |     1   (0)| 00:00:01 |
+-----------------------------------------------------------------------------------------
+ 1 - access("ENAME"='BOUMLID')

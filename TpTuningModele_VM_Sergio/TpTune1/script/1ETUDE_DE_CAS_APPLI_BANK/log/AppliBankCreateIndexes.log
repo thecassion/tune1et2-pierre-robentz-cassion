@@ -1,0 +1,182 @@
+ORS1  PDBORCL>set serveroutput on
+ORS1  PDBORCL>SET TERMOUT ON
+ORS1  PDBORCL>PROMPT Creating AppliBank Indexes.  Please wait.
+Creating AppliBank Indexes.  Please wait.
+ORS1  PDBORCL>-- EmpÃªche l'affichage Ã  l'Ã©cran
+ORS1  PDBORCL>SET TERMOUT OFF
+ORS1  PDBORCL>
+ORS1  PDBORCL>-- Proposer des indexes pour chacune des requÃªtes contenues dans le
+ORS1  PDBORCL>-- Fichier :
+ORS1  PDBORCL>
+ORS1  PDBORCL>-- Index sur la requÃªte 1 :
+ORS1  PDBORCL>drop index idx_compte_clientid;
+
+Index supprimé.
+
+ORS1  PDBORCL>create index idx_compte_clientid on compte (clientid)
+  2  /
+
+Index créé.
+
+ORS1  PDBORCL>
+ORS1  PDBORCL>-- Index sur la requÃªte 2 :
+ORS1  PDBORCL>--
+ORS1  PDBORCL>
+ORS1  PDBORCL>
+ORS1  PDBORCL>-- Index sur la requÃªte 3 :
+ORS1  PDBORCL>drop index idx_client_nom;
+
+Index supprimé.
+
+ORS1  PDBORCL>create index idx_client_nom on client (nom)
+  2  /
+
+Index créé.
+
+ORS1  PDBORCL>
+ORS1  PDBORCL>
+ORS1  PDBORCL>
+ORS1  PDBORCL>-- Index sur la requÃªte 4 :
+ORS1  PDBORCL>
+ORS1  PDBORCL>drop index idx_compte_solde;
+
+Index supprimé.
+
+ORS1  PDBORCL>create index idx_compte_solde on compte (solde)
+  2  /
+
+Index créé.
+
+ORS1  PDBORCL>
+ORS1  PDBORCL>-- Index sur la requÃªte 5 :
+ORS1  PDBORCL>
+ORS1  PDBORCL>drop index idx_transaction_compteid
+  2  /
+
+Index supprimé.
+
+ORS1  PDBORCL>create index idx_transaction_compteid on transaction(compteid)
+  2  /
+
+Index créé.
+
+ORS1  PDBORCL>
+ORS1  PDBORCL>-- Index sur la requÃªte 6 :
+ORS1  PDBORCL>
+ORS1  PDBORCL>
+ORS1  PDBORCL>
+ORS1  PDBORCL>-- Index sur la requÃªte 7 :
+ORS1  PDBORCL>
+ORS1  PDBORCL>
+ORS1  PDBORCL>
+ORS1  PDBORCL>-- Index sur la requÃªte 8 :
+ORS1  PDBORCL>drop index idx_transaction_date_operation
+  2  /
+
+Index supprimé.
+
+ORS1  PDBORCL>create index idx_transaction_date_operation on transaction(date_operation)
+  2  /
+
+Index créé.
+
+ORS1  PDBORCL>
+ORS1  PDBORCL>
+ORS1  PDBORCL>-- Index sur la requÃªte 9 :
+ORS1  PDBORCL>
+ORS1  PDBORCL>
+ORS1  PDBORCL>
+ORS1  PDBORCL>-- Index sur la requÃªte 10 :
+ORS1  PDBORCL>
+ORS1  PDBORCL>
+ORS1  PDBORCL>
+ORS1  PDBORCL>-- Index sur la requÃªte 11 :
+ORS1  PDBORCL>
+ORS1  PDBORCL>
+ORS1  PDBORCL>
+ORS1  PDBORCL>-- Index sur la requÃªte 12 :
+ORS1  PDBORCL>
+ORS1  PDBORCL>
+ORS1  PDBORCL>
+ORS1  PDBORCL>-- Index sur la requÃªte 13 :
+ORS1  PDBORCL>
+ORS1  PDBORCL>
+ORS1  PDBORCL>
+ORS1  PDBORCL>-- Index sur la requÃªte 14 :
+ORS1  PDBORCL>
+ORS1  PDBORCL>
+ORS1  PDBORCL>
+ORS1  PDBORCL>-- Index sur la requÃªte 15 :
+ORS1  PDBORCL>
+ORS1  PDBORCL>ORS1  PDBORCL>
+ORS1  PDBORCL>
+ORS1  PDBORCL>
+ORS1  PDBORCL>
+ORS1  PDBORCL>set linesize 200
+ORS1  PDBORCL>col column_name format a20
+ORS1  PDBORCL>
+ORS1  PDBORCL>select table_name, column_name, index_name
+  2  from user_ind_columns
+  3  where table_name in ('CLIENT',  'COMPTE',  'TRANSACTION')
+  4  order by table_name, index_name, column_name;
+
+TABLE_NAME                                                                                                                       COLUMN_NAME                                                            
+-------------------------------------------------------------------------------------------------------------------------------- --------------------                                                   
+INDEX_NAME                                                                                                                                                                                              
+--------------------------------------------------------------------------------------------------------------------------------                                                                        
+CLIENT                                                                                                                           NOM                                                                    
+IDX_CLIENT_NOM                                                                                                                                                                                          
+                                                                                                                                                                                                        
+CLIENT                                                                                                                           CLIENTID                                                               
+PK_CLIENT_CLIENTID                                                                                                                                                                                      
+                                                                                                                                                                                                        
+COMPTE                                                                                                                           CLIENTID                                                               
+IDX_COMPTE_CLIENTID                                                                                                                                                                                     
+                                                                                                                                                                                                        
+COMPTE                                                                                                                           SOLDE                                                                  
+IDX_COMPTE_SOLDE                                                                                                                                                                                        
+                                                                                                                                                                                                        
+COMPTE                                                                                                                           COMPTEID                                                               
+PK_COMPTE_COMPTEID                                                                                                                                                                                      
+                                                                                                                                                                                                        
+TRANSACTION                                                                                                                      COMPTEID                                                               
+IDX_TRANSACTION_COMPTEID                                                                                                                                                                                
+                                                                                                                                                                                                        
+TRANSACTION                                                                                                                      DATE_OPERATION                                                         
+IDX_TRANSACTION_DATE_OPERATION                                                                                                                                                                          
+                                                                                                                                                                                                        
+TRANSACTION                                                                                                                      OPERATION                                                              
+IDX_TRANSACTION_OPERATION                                                                                                                                                                               
+                                                                                                                                                                                                        
+TRANSACTION                                                                                                                      TRANSACTIONID                                                          
+PK_TRANSACTION_TRID                                                                                                                                                                                     
+                                                                                                                                                                                                        
+
+9 lignes sélectionnées.
+
+ORS1  PDBORCL>set linesize 200
+ORS1  PDBORCL>col column_name format a20
+ORS1  PDBORCL>col index_name format A30
+ORS1  PDBORCL>col table_name format A12
+ORS1  PDBORCL>select table_name, column_name, index_name
+  2  from user_ind_columns
+  3  where table_name in ('CLIENT',  'COMPTE',  'TRANSACTION')
+  4  order by table_name, index_name, column_name;
+
+TABLE_NAME   COLUMN_NAME          INDEX_NAME                                                                                                                                                            
+------------ -------------------- ------------------------------                                                                                                                                        
+CLIENT       NOM                  IDX_CLIENT_NOM                                                                                                                                                        
+CLIENT       CLIENTID             PK_CLIENT_CLIENTID                                                                                                                                                    
+COMPTE       CLIENTID             IDX_COMPTE_CLIENTID                                                                                                                                                   
+COMPTE       SOLDE                IDX_COMPTE_SOLDE                                                                                                                                                      
+COMPTE       COMPTEID             PK_COMPTE_COMPTEID                                                                                                                                                    
+TRANSACTION  COMPTEID             IDX_TRANSACTION_COMPTEID                                                                                                                                              
+TRANSACTION  DATE_OPERATION       IDX_TRANSACTION_DATE_OPERATION                                                                                                                                        
+TRANSACTION  OPERATION            IDX_TRANSACTION_OPERATION                                                                                                                                             
+TRANSACTION  TRANSACTIONID        PK_TRANSACTION_TRID                                                                                                                                                   
+
+9 lignes sélectionnées.
+
+ORS1  PDBORCL>@&SCRIPTPATH\6AppliBankQueryAfterIndexCreation.sql
+ORS1  PDBORCL>
+ORS1  PDBORCL>spool &SCRIPTPATH\LOG\appliBankQueryAfterIndexCreation.log

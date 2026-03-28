@@ -1,0 +1,38 @@
+          Etat ADDM sur la tâche 'TÂCHE_3948'
+          -----------------------------------
+
+Période d'analyse
+-----------------
+Plage de clichés AWR : 3736 à 3737.
+La période commence à 24/02/23 20:37:11
+La période se termine à 24/02/23 20:42:00
+
+Cible de l'analyse
+------------------
+Base de données 'COURS21C' dont l'ID est 4042692520.
+Version de base de données 21.0.0.0.0.
+ADDM a effectué une analyse de l'instance cours21c, numéro 1, hébergée à
+PC-GABRIEL.
+ADDM a détecté que le type de base de données est MULTITENANT DB.
+
+Activité pendant la période d'analyse
+-------------------------------------
+Temps total de base de données : 281 secondes.
+Nombre moyen de sessions actives : ,97.
+
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Aucun résultat.
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+          Informations supplémentaires
+          ----------------------------
+
+Informations diverses
+---------------------
+Il n'y a pas eu assez d'activité base de données pour exécuter ADDM.
+

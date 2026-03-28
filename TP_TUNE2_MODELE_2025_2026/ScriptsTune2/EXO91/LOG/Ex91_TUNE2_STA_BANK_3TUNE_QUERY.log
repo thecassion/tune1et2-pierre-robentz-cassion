@@ -1,0 +1,1443 @@
+SQL> 
+SQL> -- 1. Charger l'application bancaire (AppliBank.sql)
+SQL> -- dans le sch�ma de l'utilisateur ORS2
+SQL> 
+SQL> -- D�j� fait dans ...start.sql
+SQL> 
+SQL> -- Les index actuels sur l'application
+SQL> -- Pour l'instant seul les 3 indexes primary doivent exister
+SQL> select table_name, column_name, index_name
+  2  from user_ind_columns
+  3  where table_name in ('CLIENT',  'COMPTE',	'TRANSACTION')
+  4  order by table_name, index_name, column_name;
+
+TABLE_NAME                                                                                                                       COLUMN_NAME                                                            
+-------------------------------------------------------------------------------------------------------------------------------- --------------------                                                   
+INDEX_NAME                                                                                                                                                                                              
+--------------------------------------------------------------------------------------------------------------------------------                                                                        
+CLIENT                                                                                                                           CLIENTID                                                               
+PK_CLIENT_CLIENTID                                                                                                                                                                                      
+                                                                                                                                                                                                        
+COMPTE                                                                                                                           COMPTEID                                                               
+PK_COMPTE_COMPTEID                                                                                                                                                                                      
+                                                                                                                                                                                                        
+TRANSACTION                                                                                                                      TRANSACTIONID                                                          
+PK_TRANSACTION_TRID                                                                                                                                                                                     
+                                                                                                                                                                                                        
+
+SQL> 
+SQL>  /*
+SQL> TABLE_NAME 		    COLUMN_NAME 	 INDEX_NAME
+SQL> ------------------------------ -------------------- ------------------------------
+SQL> CLIENT			    CLIENTID		 PK_CLIENT_CLIENTID
+SQL> COMPTE			    COMPTEID		 PK_COMPTE_COMPTEID
+SQL> TRANSACTION		    TRANSACTIONID	 PK_TRANSACTION_TRID
+SQL> */
+SQL> 
+SQL> -- Ne pas cr�er les indexes ci-dessous.
+SQL> -- Ce sont les indexes qu'on aurait cr��s si on op�rait
+SQL> -- un r�glage manuel. Lorsque SQLTUNING ADVISOR aura fait
+SQL> -- des recommandations, comparez les indexes qu'ils recommandent
+SQL> -- avec ceux ci. Ces indexes sont propos�es au vu des clauses
+SQL> -- WHERE des requ�tes � optmiser automatiquement.
+SQL> 
+SQL> 
+SQL> 
+SQL> -- v�rification du type d'optimiseur
+SQL>  show parameter optimizer_mode;
+
+NAME                                 TYPE        VALUE                                                                                                                                                  
+------------------------------------ ----------- ------------------------------                                                                                                                         
+optimizer_mode                       string      ALL_ROWS                                                                                                                                               
+SQL> 
+SQL> -- optimizer_mode			     string	 ALL_ROWS
+SQL> 
+SQL> -- passer en mode all_rows si utile
+SQL> set autotrace off
+SQL> alter session set optimizer_mode=all_rows ;
+
+Session altered.
+
+SQL> 
+SQL> -- calculer les statistiques sur les objets de l'utilisateur
+SQL> -- &MYPDBUSER
+SQL> execute dbms_stats.gather_schema_stats('&MYPDBUSER');
+
+PL/SQL procedure successfully completed.
+
+SQL> 
+SQL> -- Connexion avec au niveau CDB pour prendre un clich� AWR.
+SQL> -- La gestion des statistiques se fait au niveau e ma CDB
+SQL> connect &MYCDBUSER@&DBALIASCDB/&MYCDBUSERPASS
+ERROR:
+ORA-01017: invalid credential or not authorized; logon denied
+Help: https://docs.oracle.com/error-help/db/ora-01017/ 
+
+
+Warning: You are no longer connected to ORACLE.
+SQL> 
+SQL> -- Prendre un premier clich� AWR pour d�limiter
+SQL> -- l'espace de r�cup�ration des requ�tes.
+SQL> set serveroutput on
+SQL> variable snapid1 number;
+SQL> 
+SQL> begin
+  2  	     :snapid1	     := dbms_workload_repository.create_snapshot;
+  3  	     dbms_output.put_line('snap_id1='||:snapid1);
+  4  end;
+  5  /
+SP2-0640: Not connected
+Help: https://docs.oracle.com/error-help/db/sp2-0640/
+SQL> 
+SQL> -- ReConnexion � la  PDB pour utiliser STA
+SQL> connect &MYPDBUSER@&DBALIASPDB/&MYPDBUSERPASS
+Connected.
+SQL> set arraysize 5000
+SQL> -- reporter le num�ro de clich� rendu par le programme ici :
+SQL> -- snap_id1=153  ? snap_id1=743
+SQL> 
+SQL> -- 2. Provoquer de l'activit� (requ�tes sur l'application bancaire)
+SQL> -- dans la base entre deux clich�s AWR
+SQL> 
+SQL> -- D�sactiver l'affichage � l'�cran des r�sultats des requ�tes.
+SQL>  set autotrace &TRACEOPTION
+SQL> 
+SQL> 
+SQL>  col compteid format a24
+SQL>  col nom format a20
+SQL>  col prenom format a20
+SQL>  col ville format a20
+SQL>  col adresse format a30
+SQL> 
+SQL> 
+SQL>  -- Lancer plusieurs requ�tes
+SQL> 
+SQL> -- Requ�te 1:
+SQL> -- listing des clients ayant des comptes
+SQL>  select cl.clientid, nom, prenom, compteid, typecompte, solde
+  2   from client cl, compte co
+  3   where cl.clientid=co.clientid;
+
+36323 rows selected.
+
+
+Execution Plan
+----------------------------------------------------------                                                                                                                                              
+Plan hash value: 1701175679                                                                                                                                                                             
+                                                                                                                                                                                                        
+-----------------------------------------------------------------------------                                                                                                                           
+| Id  | Operation          | Name   | Rows  | Bytes | Cost (%CPU)| Time     |                                                                                                                           
+-----------------------------------------------------------------------------                                                                                                                           
+|   0 | SELECT STATEMENT   |        | 36323 |  2518K|   204   (0)| 00:00:01 |                                                                                                                           
+|*  1 |  HASH JOIN         |        | 36323 |  2518K|   204   (0)| 00:00:01 |                                                                                                                           
+|   2 |   TABLE ACCESS FULL| CLIENT | 15790 |   323K|    68   (0)| 00:00:01 |                                                                                                                           
+|   3 |   TABLE ACCESS FULL| COMPTE | 36323 |  1773K|   136   (0)| 00:00:01 |                                                                                                                           
+-----------------------------------------------------------------------------                                                                                                                           
+                                                                                                                                                                                                        
+Predicate Information (identified by operation id):                                                                                                                                                     
+---------------------------------------------------                                                                                                                                                     
+                                                                                                                                                                                                        
+   1 - access("CL"."CLIENTID"="CO"."CLIENTID")                                                                                                                                                          
+
+
+Statistics
+----------------------------------------------------------                                                                                                                                              
+         20  recursive calls                                                                                                                                                                            
+         17  db block gets                                                                                                                                                                              
+        665  consistent gets                                                                                                                                                                            
+          3  physical reads                                                                                                                                                                             
+       2904  redo size                                                                                                                                                                                  
+    1975470  bytes sent via SQL*Net to client                                                                                                                                                           
+        283  bytes received via SQL*Net from client                                                                                                                                                     
+          9  SQL*Net roundtrips to/from client                                                                                                                                                          
+          0  sorts (memory)                                                                                                                                                                             
+          0  sorts (disk)                                                                                                                                                                               
+      36323  rows processed                                                                                                                                                                             
+
+SQL> 
+SQL>  -- Requ�te 2:
+SQL>  -- listing des clients ayant des comptes tri� selon l'identifiant et
+SQL>  -- le nom du client
+SQL>  select cl.clientid, nom, prenom, compteid, typecompte, solde
+  2   from client cl, compte co
+  3   where cl.clientid=co.clientid
+  4   order by clientid , nom;
+
+36323 rows selected.
+
+
+Execution Plan
+----------------------------------------------------------                                                                                                                                              
+Plan hash value: 397642463                                                                                                                                                                              
+                                                                                                                                                                                                        
+--------------------------------------------------------------------------------------                                                                                                                  
+| Id  | Operation           | Name   | Rows  | Bytes |TempSpc| Cost (%CPU)| Time     |                                                                                                                  
+--------------------------------------------------------------------------------------                                                                                                                  
+|   0 | SELECT STATEMENT    |        | 36323 |  2518K|       |   818   (1)| 00:00:01 |                                                                                                                  
+|   1 |  SORT ORDER BY      |        | 36323 |  2518K|  3008K|   818   (1)| 00:00:01 |                                                                                                                  
+|*  2 |   HASH JOIN         |        | 36323 |  2518K|       |   204   (0)| 00:00:01 |                                                                                                                  
+|   3 |    TABLE ACCESS FULL| CLIENT | 15790 |   323K|       |    68   (0)| 00:00:01 |                                                                                                                  
+|   4 |    TABLE ACCESS FULL| COMPTE | 36323 |  1773K|       |   136   (0)| 00:00:01 |                                                                                                                  
+--------------------------------------------------------------------------------------                                                                                                                  
+                                                                                                                                                                                                        
+Predicate Information (identified by operation id):                                                                                                                                                     
+---------------------------------------------------                                                                                                                                                     
+                                                                                                                                                                                                        
+   2 - access("CL"."CLIENTID"="CO"."CLIENTID")                                                                                                                                                          
+
+
+Statistics
+----------------------------------------------------------                                                                                                                                              
+          8  recursive calls                                                                                                                                                                            
+          0  db block gets                                                                                                                                                                              
+        650  consistent gets                                                                                                                                                                            
+          0  physical reads                                                                                                                                                                             
+          0  redo size                                                                                                                                                                                  
+    2111246  bytes sent via SQL*Net to client                                                                                                                                                           
+        283  bytes received via SQL*Net from client                                                                                                                                                     
+          9  SQL*Net roundtrips to/from client                                                                                                                                                          
+          1  sorts (memory)                                                                                                                                                                             
+          0  sorts (disk)                                                                                                                                                                               
+      36323  rows processed                                                                                                                                                                             
+
+SQL> 
+SQL> -- Requ�te 3:
+SQL> -- listing des comptes d'un client connaissant son nom
+SQL>  select cl.clientid, nom, prenom, compteid, typecompte, solde
+  2   from client cl, compte co
+  3   where cl.clientid=co.clientid
+  4   and nom ='Petit'
+  5   order by co.clientid, nom, prenom;
+
+28 rows selected.
+
+
+Execution Plan
+----------------------------------------------------------                                                                                                                                              
+Plan hash value: 397642463                                                                                                                                                                              
+                                                                                                                                                                                                        
+------------------------------------------------------------------------------                                                                                                                          
+| Id  | Operation           | Name   | Rows  | Bytes | Cost (%CPU)| Time     |                                                                                                                          
+------------------------------------------------------------------------------                                                                                                                          
+|   0 | SELECT STATEMENT    |        |    12 |   852 |   205   (1)| 00:00:01 |                                                                                                                          
+|   1 |  SORT ORDER BY      |        |    12 |   852 |   205   (1)| 00:00:01 |                                                                                                                          
+|*  2 |   HASH JOIN         |        |    12 |   852 |   204   (0)| 00:00:01 |                                                                                                                          
+|*  3 |    TABLE ACCESS FULL| CLIENT |     5 |   105 |    68   (0)| 00:00:01 |                                                                                                                          
+|   4 |    TABLE ACCESS FULL| COMPTE | 36323 |  1773K|   136   (0)| 00:00:01 |                                                                                                                          
+------------------------------------------------------------------------------                                                                                                                          
+                                                                                                                                                                                                        
+Predicate Information (identified by operation id):                                                                                                                                                     
+---------------------------------------------------                                                                                                                                                     
+                                                                                                                                                                                                        
+   2 - access("CL"."CLIENTID"="CO"."CLIENTID")                                                                                                                                                          
+   3 - filter("NOM"='Petit')                                                                                                                                                                            
+
+
+Statistics
+----------------------------------------------------------                                                                                                                                              
+         86  recursive calls                                                                                                                                                                            
+          4  db block gets                                                                                                                                                                              
+        739  consistent gets                                                                                                                                                                            
+          0  physical reads                                                                                                                                                                             
+        520  redo size                                                                                                                                                                                  
+       2598  bytes sent via SQL*Net to client                                                                                                                                                           
+        108  bytes received via SQL*Net from client                                                                                                                                                     
+          2  SQL*Net roundtrips to/from client                                                                                                                                                          
+          6  sorts (memory)                                                                                                                                                                             
+          0  sorts (disk)                                                                                                                                                                               
+         28  rows processed                                                                                                                                                                             
+
+SQL> 
+SQL> 
+SQL>  -- Requ�te 4:
+SQL>  -- listing des informations sur les comptes et clients
+SQL>  -- dont le solde est n�gatif
+SQL>  select cl.clientid, nom, prenom, compteid, typecompte, solde
+  2   from client cl, compte co
+  3   where cl.clientid=co.clientid
+  4   and solde <0;
+
+no rows selected
+
+
+Execution Plan
+----------------------------------------------------------                                                                                                                                              
+Plan hash value: 3128710315                                                                                                                                                                             
+                                                                                                                                                                                                        
+---------------------------------------------------------------------------------------------------                                                                                                     
+| Id  | Operation                    | Name               | Rows  | Bytes | Cost (%CPU)| Time     |                                                                                                     
+---------------------------------------------------------------------------------------------------                                                                                                     
+|   0 | SELECT STATEMENT             |                    |     1 |    71 |   137   (0)| 00:00:01 |                                                                                                     
+|   1 |  NESTED LOOPS                |                    |     1 |    71 |   137   (0)| 00:00:01 |                                                                                                     
+|   2 |   NESTED LOOPS               |                    |     1 |    71 |   137   (0)| 00:00:01 |                                                                                                     
+|*  3 |    TABLE ACCESS FULL         | COMPTE             |     1 |    50 |   136   (0)| 00:00:01 |                                                                                                     
+|*  4 |    INDEX UNIQUE SCAN         | PK_CLIENT_CLIENTID |     1 |       |     0   (0)| 00:00:01 |                                                                                                     
+|   5 |   TABLE ACCESS BY INDEX ROWID| CLIENT             |     1 |    21 |     1   (0)| 00:00:01 |                                                                                                     
+---------------------------------------------------------------------------------------------------                                                                                                     
+                                                                                                                                                                                                        
+Predicate Information (identified by operation id):                                                                                                                                                     
+---------------------------------------------------                                                                                                                                                     
+                                                                                                                                                                                                        
+   3 - filter("SOLDE"<0)                                                                                                                                                                                
+   4 - access("CL"."CLIENTID"="CO"."CLIENTID")                                                                                                                                                          
+                                                                                                                                                                                                        
+Note                                                                                                                                                                                                    
+-----                                                                                                                                                                                                   
+   - this is an adaptive plan                                                                                                                                                                           
+
+
+Statistics
+----------------------------------------------------------                                                                                                                                              
+          9  recursive calls                                                                                                                                                                            
+          3  db block gets                                                                                                                                                                              
+        463  consistent gets                                                                                                                                                                            
+          0  physical reads                                                                                                                                                                             
+        576  redo size                                                                                                                                                                                  
+        851  bytes sent via SQL*Net to client                                                                                                                                                           
+         83  bytes received via SQL*Net from client                                                                                                                                                     
+          1  SQL*Net roundtrips to/from client                                                                                                                                                          
+          0  sorts (memory)                                                                                                                                                                             
+          0  sorts (disk)                                                                                                                                                                               
+          0  rows processed                                                                                                                                                                             
+
+SQL> 
+SQL> 
+SQL> -- Requ�te 5:
+SQL> -- listing des transactions par compte et client
+SQL>  select cl.clientid, nom, prenom, co.compteid, co.typecompte, tr.date_operation,  operation,
+  2   optionoperation, montant
+  3   from client cl, compte co, transaction tr
+  4   where cl.clientid=co.clientid and co.compteid=tr.compteid;
+
+435876 rows selected.
+
+
+Execution Plan
+----------------------------------------------------------                                                                                                                                              
+Plan hash value: 3806039989                                                                                                                                                                             
+                                                                                                                                                                                                        
+-------------------------------------------------------------------------------------------                                                                                                             
+| Id  | Operation           | Name        | Rows  | Bytes |TempSpc| Cost (%CPU)| Time     |                                                                                                             
+-------------------------------------------------------------------------------------------                                                                                                             
+|   0 | SELECT STATEMENT    |             |   435K|    49M|       |  2670   (1)| 00:00:01 |                                                                                                             
+|*  1 |  HASH JOIN          |             |   435K|    49M|       |  2670   (1)| 00:00:01 |                                                                                                             
+|   2 |   TABLE ACCESS FULL | CLIENT      | 15790 |   323K|       |    68   (0)| 00:00:01 |                                                                                                             
+|*  3 |   HASH JOIN         |             |   435K|    40M|  2024K|  2601   (1)| 00:00:01 |                                                                                                             
+|   4 |    TABLE ACCESS FULL| COMPTE      | 36323 |  1596K|       |   136   (0)| 00:00:01 |                                                                                                             
+|   5 |    TABLE ACCESS FULL| TRANSACTION |   435K|    22M|       |  1025   (1)| 00:00:01 |                                                                                                             
+-------------------------------------------------------------------------------------------                                                                                                             
+                                                                                                                                                                                                        
+Predicate Information (identified by operation id):                                                                                                                                                     
+---------------------------------------------------                                                                                                                                                     
+                                                                                                                                                                                                        
+   1 - access("CL"."CLIENTID"="CO"."CLIENTID")                                                                                                                                                          
+   3 - access("CO"."COMPTEID"="TR"."COMPTEID")                                                                                                                                                          
+
+
+Statistics
+----------------------------------------------------------                                                                                                                                              
+         45  recursive calls                                                                                                                                                                            
+         27  db block gets                                                                                                                                                                              
+       4458  consistent gets                                                                                                                                                                            
+          0  physical reads                                                                                                                                                                             
+       4768  redo size                                                                                                                                                                                  
+   23820243  bytes sent via SQL*Net to client                                                                                                                                                           
+       2283  bytes received via SQL*Net from client                                                                                                                                                     
+         89  SQL*Net roundtrips to/from client                                                                                                                                                          
+          0  sorts (memory)                                                                                                                                                                             
+          0  sorts (disk)                                                                                                                                                                               
+     435876  rows processed                                                                                                                                                                             
+
+SQL> 
+SQL> 
+SQL>  -- Requ�te 6:
+SQL>  -- listing des transactions par compte et client pour lesquels le solde du compte n�gatif
+SQL>  select cl.clientid, nom, prenom, co.compteid, co.typecompte, tr.date_operation,  operation,
+  2   optionoperation, montant
+  3   from client cl, compte co, transaction tr
+  4   where cl.clientid=co.clientid and co.compteid=tr.compteid
+  5   and co.solde <0;
+
+no rows selected
+
+
+Execution Plan
+----------------------------------------------------------                                                                                                                                              
+Plan hash value: 4047996969                                                                                                                                                                             
+                                                                                                                                                                                                        
+----------------------------------------------------------------------------------------------------                                                                                                    
+| Id  | Operation                     | Name               | Rows  | Bytes | Cost (%CPU)| Time     |                                                                                                    
+----------------------------------------------------------------------------------------------------                                                                                                    
+|   0 | SELECT STATEMENT              |                    |    13 |  1612 |  1163   (1)| 00:00:01 |                                                                                                    
+|*  1 |  HASH JOIN                    |                    |    13 |  1612 |  1163   (1)| 00:00:01 |                                                                                                    
+|   2 |   NESTED LOOPS                |                    |     1 |    71 |   137   (0)| 00:00:01 |                                                                                                    
+|   3 |    NESTED LOOPS               |                    |     1 |    71 |   137   (0)| 00:00:01 |                                                                                                    
+|*  4 |     TABLE ACCESS FULL         | COMPTE             |     1 |    50 |   136   (0)| 00:00:01 |                                                                                                    
+|*  5 |     INDEX UNIQUE SCAN         | PK_CLIENT_CLIENTID |     1 |       |     0   (0)| 00:00:01 |                                                                                                    
+|   6 |    TABLE ACCESS BY INDEX ROWID| CLIENT             |     1 |    21 |     1   (0)| 00:00:01 |                                                                                                    
+|   7 |   TABLE ACCESS FULL           | TRANSACTION        |   435K|    22M|  1025   (1)| 00:00:01 |                                                                                                    
+----------------------------------------------------------------------------------------------------                                                                                                    
+                                                                                                                                                                                                        
+Predicate Information (identified by operation id):                                                                                                                                                     
+---------------------------------------------------                                                                                                                                                     
+                                                                                                                                                                                                        
+   1 - access("CO"."COMPTEID"="TR"."COMPTEID")                                                                                                                                                          
+   4 - filter("CO"."SOLDE"<0)                                                                                                                                                                           
+   5 - access("CL"."CLIENTID"="CO"."CLIENTID")                                                                                                                                                          
+                                                                                                                                                                                                        
+Note                                                                                                                                                                                                    
+-----                                                                                                                                                                                                   
+   - this is an adaptive plan                                                                                                                                                                           
+
+
+Statistics
+----------------------------------------------------------                                                                                                                                              
+         29  recursive calls                                                                                                                                                                            
+          0  db block gets                                                                                                                                                                              
+        466  consistent gets                                                                                                                                                                            
+          0  physical reads                                                                                                                                                                             
+          0  redo size                                                                                                                                                                                  
+       1155  bytes sent via SQL*Net to client                                                                                                                                                           
+         83  bytes received via SQL*Net from client                                                                                                                                                     
+          1  SQL*Net roundtrips to/from client                                                                                                                                                          
+          0  sorts (memory)                                                                                                                                                                             
+          0  sorts (disk)                                                                                                                                                                               
+          0  rows processed                                                                                                                                                                             
+
+SQL> 
+SQL> -- Requ�te 7:
+SQL> -- liste des transactions par compte et client connaissant le nom du client
+SQL>  select cl.clientid, nom, prenom, co.compteid, co.typecompte, tr.date_operation,  operation,
+  2   optionoperation, montant
+  3   from client cl, compte co, transaction tr
+  4   where cl.clientid=co.clientid and co.compteid=tr.compteid
+  5   and cl.nom='Petit';
+
+336 rows selected.
+
+
+Execution Plan
+----------------------------------------------------------                                                                                                                                              
+Plan hash value: 2696959377                                                                                                                                                                             
+                                                                                                                                                                                                        
+-----------------------------------------------------------------------------------                                                                                                                     
+| Id  | Operation           | Name        | Rows  | Bytes | Cost (%CPU)| Time     |                                                                                                                     
+-----------------------------------------------------------------------------------                                                                                                                     
+|   0 | SELECT STATEMENT    |             |   149 | 17731 |  1230   (1)| 00:00:01 |                                                                                                                     
+|*  1 |  HASH JOIN          |             |   149 | 17731 |  1230   (1)| 00:00:01 |                                                                                                                     
+|*  2 |   HASH JOIN         |             |    12 |   792 |   204   (0)| 00:00:01 |                                                                                                                     
+|*  3 |    TABLE ACCESS FULL| CLIENT      |     5 |   105 |    68   (0)| 00:00:01 |                                                                                                                     
+|   4 |    TABLE ACCESS FULL| COMPTE      | 36323 |  1596K|   136   (0)| 00:00:01 |                                                                                                                     
+|   5 |   TABLE ACCESS FULL | TRANSACTION |   435K|    22M|  1025   (1)| 00:00:01 |                                                                                                                     
+-----------------------------------------------------------------------------------                                                                                                                     
+                                                                                                                                                                                                        
+Predicate Information (identified by operation id):                                                                                                                                                     
+---------------------------------------------------                                                                                                                                                     
+                                                                                                                                                                                                        
+   1 - access("CO"."COMPTEID"="TR"."COMPTEID")                                                                                                                                                          
+   2 - access("CL"."CLIENTID"="CO"."CLIENTID")                                                                                                                                                          
+   3 - filter("CL"."NOM"='Petit')                                                                                                                                                                       
+
+
+Statistics
+----------------------------------------------------------                                                                                                                                              
+         29  recursive calls                                                                                                                                                                            
+          0  db block gets                                                                                                                                                                              
+       4362  consistent gets                                                                                                                                                                            
+          0  physical reads                                                                                                                                                                             
+          0  redo size                                                                                                                                                                                  
+      19616  bytes sent via SQL*Net to client                                                                                                                                                           
+        108  bytes received via SQL*Net from client                                                                                                                                                     
+          2  SQL*Net roundtrips to/from client                                                                                                                                                          
+          0  sorts (memory)                                                                                                                                                                             
+          0  sorts (disk)                                                                                                                                                                               
+        336  rows processed                                                                                                                                                                             
+
+SQL> 
+SQL>  -- Requ�te 8:
+SQL>  -- liste des transactions par compte et client connaissant le nom du client et op�r�es � une date donn�e
+SQL>  select cl.clientid, nom, prenom, co.compteid, co.typecompte, tr.date_operation,  operation,
+  2   optionoperation, montant
+  3   from client cl, compte co, transaction tr
+  4   where cl.clientid=co.clientid and co.compteid=tr.compteid
+  5   and cl.nom='Petit' and date_operation=to_date('27-01-2010', 'DD-MM-YYYY');
+
+no rows selected
+
+
+Execution Plan
+----------------------------------------------------------                                                                                                                                              
+Plan hash value: 3152450571                                                                                                                                                                             
+                                                                                                                                                                                                        
+-----------------------------------------------------------------------------------------------------                                                                                                   
+| Id  | Operation                      | Name               | Rows  | Bytes | Cost (%CPU)| Time     |                                                                                                   
+-----------------------------------------------------------------------------------------------------                                                                                                   
+|   0 | SELECT STATEMENT               |                    |     1 |   119 |  1029   (1)| 00:00:01 |                                                                                                   
+|   1 |  NESTED LOOPS                  |                    |     1 |   119 |  1029   (1)| 00:00:01 |                                                                                                   
+|   2 |   NESTED LOOPS                 |                    |     1 |   119 |  1029   (1)| 00:00:01 |                                                                                                   
+|   3 |    NESTED LOOPS                |                    |     1 |    98 |  1028   (1)| 00:00:01 |                                                                                                   
+|*  4 |     TABLE ACCESS FULL          | TRANSACTION        |     1 |    53 |  1026   (1)| 00:00:01 |                                                                                                   
+|   5 |     TABLE ACCESS BY INDEX ROWID| COMPTE             |     1 |    45 |     2   (0)| 00:00:01 |                                                                                                   
+|*  6 |      INDEX UNIQUE SCAN         | PK_COMPTE_COMPTEID |     1 |       |     1   (0)| 00:00:01 |                                                                                                   
+|*  7 |    INDEX UNIQUE SCAN           | PK_CLIENT_CLIENTID |     1 |       |     0   (0)| 00:00:01 |                                                                                                   
+|*  8 |   TABLE ACCESS BY INDEX ROWID  | CLIENT             |     1 |    21 |     1   (0)| 00:00:01 |                                                                                                   
+-----------------------------------------------------------------------------------------------------                                                                                                   
+                                                                                                                                                                                                        
+Predicate Information (identified by operation id):                                                                                                                                                     
+---------------------------------------------------                                                                                                                                                     
+                                                                                                                                                                                                        
+   4 - filter("DATE_OPERATION"=TO_DATE(' 2010-01-27 00:00:00', 'syyyy-mm-dd hh24:mi:ss'))                                                                                                               
+   6 - access("CO"."COMPTEID"="TR"."COMPTEID")                                                                                                                                                          
+   7 - access("CL"."CLIENTID"="CO"."CLIENTID")                                                                                                                                                          
+   8 - filter("CL"."NOM"='Petit')                                                                                                                                                                       
+                                                                                                                                                                                                        
+Note                                                                                                                                                                                                    
+-----                                                                                                                                                                                                   
+   - this is an adaptive plan                                                                                                                                                                           
+
+
+Statistics
+----------------------------------------------------------                                                                                                                                              
+         30  recursive calls                                                                                                                                                                            
+          3  db block gets                                                                                                                                                                              
+       3716  consistent gets                                                                                                                                                                            
+          0  physical reads                                                                                                                                                                             
+        576  redo size                                                                                                                                                                                  
+       1155  bytes sent via SQL*Net to client                                                                                                                                                           
+         83  bytes received via SQL*Net from client                                                                                                                                                     
+          1  SQL*Net roundtrips to/from client                                                                                                                                                          
+          0  sorts (memory)                                                                                                                                                                             
+          0  sorts (disk)                                                                                                                                                                               
+          0  rows processed                                                                                                                                                                             
+
+SQL> 
+SQL> 
+SQL>  -- Requ�te 9:
+SQL>  -- liste des op�ration d'un client donn�es de type DEBIT
+SQL>  select cl.clientid, nom, prenom, co.compteid, co.typecompte, tr.date_operation,  operation,
+  2   optionoperation, montant
+  3   from client cl, compte co, transaction tr
+  4   where cl.clientid=co.clientid and co.compteid=tr.compteid
+  5   and cl.nom='Petit' and operation='DEBIT';
+
+280 rows selected.
+
+
+Execution Plan
+----------------------------------------------------------                                                                                                                                              
+Plan hash value: 2696959377                                                                                                                                                                             
+                                                                                                                                                                                                        
+-----------------------------------------------------------------------------------                                                                                                                     
+| Id  | Operation           | Name        | Rows  | Bytes | Cost (%CPU)| Time     |                                                                                                                     
+-----------------------------------------------------------------------------------                                                                                                                     
+|   0 | SELECT STATEMENT    |             |    74 |  8806 |  1230   (1)| 00:00:01 |                                                                                                                     
+|*  1 |  HASH JOIN          |             |    74 |  8806 |  1230   (1)| 00:00:01 |                                                                                                                     
+|*  2 |   HASH JOIN         |             |    12 |   792 |   204   (0)| 00:00:01 |                                                                                                                     
+|*  3 |    TABLE ACCESS FULL| CLIENT      |     5 |   105 |    68   (0)| 00:00:01 |                                                                                                                     
+|   4 |    TABLE ACCESS FULL| COMPTE      | 36323 |  1596K|   136   (0)| 00:00:01 |                                                                                                                     
+|*  5 |   TABLE ACCESS FULL | TRANSACTION |   217K|    11M|  1025   (1)| 00:00:01 |                                                                                                                     
+-----------------------------------------------------------------------------------                                                                                                                     
+                                                                                                                                                                                                        
+Predicate Information (identified by operation id):                                                                                                                                                     
+---------------------------------------------------                                                                                                                                                     
+                                                                                                                                                                                                        
+   1 - access("CO"."COMPTEID"="TR"."COMPTEID")                                                                                                                                                          
+   2 - access("CL"."CLIENTID"="CO"."CLIENTID")                                                                                                                                                          
+   3 - filter("CL"."NOM"='Petit')                                                                                                                                                                       
+   5 - filter("OPERATION"='DEBIT')                                                                                                                                                                      
+
+
+Statistics
+----------------------------------------------------------                                                                                                                                              
+         30  recursive calls                                                                                                                                                                            
+          3  db block gets                                                                                                                                                                              
+       4365  consistent gets                                                                                                                                                                            
+          0  physical reads                                                                                                                                                                             
+        520  redo size                                                                                                                                                                                  
+      16149  bytes sent via SQL*Net to client                                                                                                                                                           
+        108  bytes received via SQL*Net from client                                                                                                                                                     
+          2  SQL*Net roundtrips to/from client                                                                                                                                                          
+          0  sorts (memory)                                                                                                                                                                             
+          0  sorts (disk)                                                                                                                                                                               
+        280  rows processed                                                                                                                                                                             
+
+SQL> 
+SQL> 
+SQL>  -- Requ�te 10:
+SQL>  -- total des transaction par client, par compte, par operation
+SQL> 
+SQL>   select cl.clientid,  co.compteid, operation, sum(montant)
+  2   from client cl, compte co, transaction tr
+  3   where cl.clientid=co.clientid and co.compteid=tr.compteid
+  4   group by cl.clientid,  co.compteid, operation;
+
+72646 rows selected.
+
+
+Execution Plan
+----------------------------------------------------------                                                                                                                                              
+Plan hash value: 2068842575                                                                                                                                                                             
+                                                                                                                                                                                                        
+---------------------------------------------------------------------------------------------                                                                                                           
+| Id  | Operation             | Name        | Rows  | Bytes |TempSpc| Cost (%CPU)| Time     |                                                                                                           
+---------------------------------------------------------------------------------------------                                                                                                           
+|   0 | SELECT STATEMENT      |             | 51138 |  3745K|       |  4079   (1)| 00:00:01 |                                                                                                           
+|   1 |  HASH GROUP BY        |             | 51138 |  3745K|  4456K|  4079   (1)| 00:00:01 |                                                                                                           
+|*  2 |   HASH JOIN           |             | 51138 |  3745K|  1496K|  3176   (1)| 00:00:01 |                                                                                                           
+|*  3 |    TABLE ACCESS FULL  | COMPTE      | 36323 |  1064K|       |   136   (0)| 00:00:01 |                                                                                                           
+|   4 |    VIEW               | VW_GBC_5    | 51138 |  2247K|       |  2829   (1)| 00:00:01 |                                                                                                           
+|   5 |     HASH GROUP BY     |             | 51138 |  1847K|    20M|  2829   (1)| 00:00:01 |                                                                                                           
+|   6 |      TABLE ACCESS FULL| TRANSACTION |   435K|    15M|       |  1025   (1)| 00:00:01 |                                                                                                           
+---------------------------------------------------------------------------------------------                                                                                                           
+                                                                                                                                                                                                        
+Predicate Information (identified by operation id):                                                                                                                                                     
+---------------------------------------------------                                                                                                                                                     
+                                                                                                                                                                                                        
+   2 - access("CO"."COMPTEID"="ITEM_1")                                                                                                                                                                 
+   3 - filter("CO"."CLIENTID" IS NOT NULL)                                                                                                                                                              
+
+
+Statistics
+----------------------------------------------------------                                                                                                                                              
+        119  recursive calls                                                                                                                                                                            
+         10  db block gets                                                                                                                                                                              
+       4275  consistent gets                                                                                                                                                                            
+          1  physical reads                                                                                                                                                                             
+       1736  redo size                                                                                                                                                                                  
+    3061632  bytes sent via SQL*Net to client                                                                                                                                                           
+        458  bytes received via SQL*Net from client                                                                                                                                                     
+         16  SQL*Net roundtrips to/from client                                                                                                                                                          
+          5  sorts (memory)                                                                                                                                                                             
+          0  sorts (disk)                                                                                                                                                                               
+      72646  rows processed                                                                                                                                                                             
+
+SQL> 
+SQL> 
+SQL> -- Requ�te 11:
+SQL>  -- total des transaction par client, par compte, par operation
+SQL>  -- dont le total est sup�rieur � 10000
+SQL> 
+SQL>  select cl.clientid,  tr.compteid, operation, sum(montant)
+  2   from client cl, compte co, transaction tr
+  3   where cl.clientid=co.clientid and co.compteid=tr.compteid
+  4   group by cl.clientid,  tr.compteid, operation
+  5   having sum(montant) >10000;
+
+37168 rows selected.
+
+
+Execution Plan
+----------------------------------------------------------                                                                                                                                              
+Plan hash value: 677009614                                                                                                                                                                              
+                                                                                                                                                                                                        
+----------------------------------------------------------------------------------------------                                                                                                          
+| Id  | Operation              | Name        | Rows  | Bytes |TempSpc| Cost (%CPU)| Time     |                                                                                                          
+----------------------------------------------------------------------------------------------                                                                                                          
+|   0 | SELECT STATEMENT       |             |  2557 |   187K|       |  3178   (1)| 00:00:01 |                                                                                                          
+|*  1 |  FILTER                |             |       |       |       |            |          |                                                                                                          
+|   2 |   HASH GROUP BY        |             |  2557 |   187K|       |  3178   (1)| 00:00:01 |                                                                                                          
+|*  3 |    HASH JOIN           |             | 51138 |  3745K|  1496K|  3176   (1)| 00:00:01 |                                                                                                          
+|*  4 |     TABLE ACCESS FULL  | COMPTE      | 36323 |  1064K|       |   136   (0)| 00:00:01 |                                                                                                          
+|   5 |     VIEW               | VW_GBC_5    | 51138 |  2247K|       |  2829   (1)| 00:00:01 |                                                                                                          
+|   6 |      HASH GROUP BY     |             | 51138 |  1847K|    20M|  2829   (1)| 00:00:01 |                                                                                                          
+|   7 |       TABLE ACCESS FULL| TRANSACTION |   435K|    15M|       |  1025   (1)| 00:00:01 |                                                                                                          
+----------------------------------------------------------------------------------------------                                                                                                          
+                                                                                                                                                                                                        
+Predicate Information (identified by operation id):                                                                                                                                                     
+---------------------------------------------------                                                                                                                                                     
+                                                                                                                                                                                                        
+   1 - filter(SUM("ITEM_2")>10000)                                                                                                                                                                      
+   3 - access("CO"."COMPTEID"="ITEM_1")                                                                                                                                                                 
+   4 - filter("CO"."CLIENTID" IS NOT NULL)                                                                                                                                                              
+
+
+Statistics
+----------------------------------------------------------                                                                                                                                              
+         30  recursive calls                                                                                                                                                                            
+          0  db block gets                                                                                                                                                                              
+       4173  consistent gets                                                                                                                                                                            
+          0  physical reads                                                                                                                                                                             
+          0  redo size                                                                                                                                                                                  
+    1474666  bytes sent via SQL*Net to client                                                                                                                                                           
+        283  bytes received via SQL*Net from client                                                                                                                                                     
+          9  SQL*Net roundtrips to/from client                                                                                                                                                          
+          0  sorts (memory)                                                                                                                                                                             
+          0  sorts (disk)                                                                                                                                                                               
+      37168  rows processed                                                                                                                                                                             
+
+SQL> 
+SQL> 
+SQL>  -- Requ�te 12:
+SQL> -- balance des transactions par type et par date
+SQL>  select  operation, date_operation, sum(montant)
+  2   from transaction tr
+  3   group by operation, date_operation;
+
+12 rows selected.
+
+
+Execution Plan
+----------------------------------------------------------                                                                                                                                              
+Plan hash value: 2290523699                                                                                                                                                                             
+                                                                                                                                                                                                        
+----------------------------------------------------------------------------------                                                                                                                      
+| Id  | Operation          | Name        | Rows  | Bytes | Cost (%CPU)| Time     |                                                                                                                      
+----------------------------------------------------------------------------------                                                                                                                      
+|   0 | SELECT STATEMENT   |             |    17 |   340 |  1032   (1)| 00:00:01 |                                                                                                                      
+|   1 |  HASH GROUP BY     |             |    17 |   340 |  1032   (1)| 00:00:01 |                                                                                                                      
+|   2 |   TABLE ACCESS FULL| TRANSACTION |   435K|  8513K|  1025   (1)| 00:00:01 |                                                                                                                      
+----------------------------------------------------------------------------------                                                                                                                      
+
+
+Statistics
+----------------------------------------------------------                                                                                                                                              
+          3  recursive calls                                                                                                                                                                            
+          5  db block gets                                                                                                                                                                              
+       3709  consistent gets                                                                                                                                                                            
+          0  physical reads                                                                                                                                                                             
+        840  redo size                                                                                                                                                                                  
+       1082  bytes sent via SQL*Net to client                                                                                                                                                           
+        108  bytes received via SQL*Net from client                                                                                                                                                     
+          2  SQL*Net roundtrips to/from client                                                                                                                                                          
+          0  sorts (memory)                                                                                                                                                                             
+          0  sorts (disk)                                                                                                                                                                               
+         12  rows processed                                                                                                                                                                             
+
+SQL> 
+SQL> -- Requ�te 13:
+SQL> -- balance des transactions par type
+SQL>  select  operation, sum(montant)
+  2   from transaction tr
+  3   group by operation;
+
+
+Execution Plan
+----------------------------------------------------------                                                                                                                                              
+Plan hash value: 2290523699                                                                                                                                                                             
+                                                                                                                                                                                                        
+----------------------------------------------------------------------------------                                                                                                                      
+| Id  | Operation          | Name        | Rows  | Bytes | Cost (%CPU)| Time     |                                                                                                                      
+----------------------------------------------------------------------------------                                                                                                                      
+|   0 | SELECT STATEMENT   |             |     2 |    24 |  1032   (1)| 00:00:01 |                                                                                                                      
+|   1 |  HASH GROUP BY     |             |     2 |    24 |  1032   (1)| 00:00:01 |                                                                                                                      
+|   2 |   TABLE ACCESS FULL| TRANSACTION |   435K|  5107K|  1025   (1)| 00:00:01 |                                                                                                                      
+----------------------------------------------------------------------------------                                                                                                                      
+
+
+Statistics
+----------------------------------------------------------                                                                                                                                              
+          1  recursive calls                                                                                                                                                                            
+          0  db block gets                                                                                                                                                                              
+       3705  consistent gets                                                                                                                                                                            
+          0  physical reads                                                                                                                                                                             
+          0  redo size                                                                                                                                                                                  
+        762  bytes sent via SQL*Net to client                                                                                                                                                           
+        108  bytes received via SQL*Net from client                                                                                                                                                     
+          2  SQL*Net roundtrips to/from client                                                                                                                                                          
+          0  sorts (memory)                                                                                                                                                                             
+          0  sorts (disk)                                                                                                                                                                               
+          2  rows processed                                                                                                                                                                             
+
+SQL> 
+SQL>  -- Requ�te 14:
+SQL>  -- Balance des transactions par type pour des compte �pargne
+SQL>  -- entre deux dates
+SQL>  select co.typecompte,  operation, sum(montant)
+  2   from client cl, compte co, transaction tr
+  3   where cl.clientid=co.clientid and co.compteid=tr.compteid
+  4   and tr.date_operation
+  5   between to_date('25-01-2010', 'DD-MM-YYYY') and to_date('27-01-2010', 'DD-MM-YYYY')
+  6   group by co.typecompte,  operation ;
+
+no rows selected
+
+
+Execution Plan
+----------------------------------------------------------                                                                                                                                              
+Plan hash value: 2499624889                                                                                                                                                                             
+                                                                                                                                                                                                        
+--------------------------------------------------------------------------------------------                                                                                                            
+| Id  | Operation            | Name        | Rows  | Bytes |TempSpc| Cost (%CPU)| Time     |                                                                                                            
+--------------------------------------------------------------------------------------------                                                                                                            
+|   0 | SELECT STATEMENT     |             |     3 |   264 |       |  1356   (1)| 00:00:01 |                                                                                                            
+|   1 |  HASH GROUP BY       |             |     3 |   264 |       |  1356   (1)| 00:00:01 |                                                                                                            
+|*  2 |   HASH JOIN          |             | 36323 |  3121K|  1952K|  1355   (1)| 00:00:01 |                                                                                                            
+|   3 |    VIEW              | VW_GBF_5    | 36323 |  1525K|       |   136   (0)| 00:00:01 |                                                                                                            
+|*  4 |     TABLE ACCESS FULL| COMPTE      | 36323 |  1596K|       |   136   (0)| 00:00:01 |                                                                                                            
+|*  5 |    TABLE ACCESS FULL | TRANSACTION | 36323 |  1596K|       |  1026   (1)| 00:00:01 |                                                                                                            
+--------------------------------------------------------------------------------------------                                                                                                            
+                                                                                                                                                                                                        
+Predicate Information (identified by operation id):                                                                                                                                                     
+---------------------------------------------------                                                                                                                                                     
+                                                                                                                                                                                                        
+   2 - access("ITEM_1"="TR"."COMPTEID")                                                                                                                                                                 
+   4 - filter("CO"."CLIENTID" IS NOT NULL)                                                                                                                                                              
+   5 - filter("TR"."DATE_OPERATION"<=TO_DATE(' 2010-01-27 00:00:00', 'syyyy-mm-dd                                                                                                                       
+              hh24:mi:ss') AND "TR"."DATE_OPERATION">=TO_DATE(' 2010-01-25 00:00:00',                                                                                                                   
+              'syyyy-mm-dd hh24:mi:ss'))                                                                                                                                                                
+
+
+Statistics
+----------------------------------------------------------                                                                                                                                              
+        112  recursive calls                                                                                                                                                                            
+         13  db block gets                                                                                                                                                                              
+       4202  consistent gets                                                                                                                                                                            
+          0  physical reads                                                                                                                                                                             
+       2464  redo size                                                                                                                                                                                  
+        578  bytes sent via SQL*Net to client                                                                                                                                                           
+         83  bytes received via SQL*Net from client                                                                                                                                                     
+          1  SQL*Net roundtrips to/from client                                                                                                                                                          
+          0  sorts (memory)                                                                                                                                                                             
+          0  sorts (disk)                                                                                                                                                                               
+          0  rows processed                                                                                                                                                                             
+
+SQL> 
+SQL>  -- Requ�te 15:
+SQL>  -- un connexion de jointure manque
+SQL>  select co.typecompte,  operation, sum(montant)
+  2   from client cl, compte co, transaction tr
+  3   where cl.clientid=co.clientid
+  4   and tr.date_operation
+  5   between to_date('25-01-2010', 'DD-MM-YYYY') and to_date('27-01-2010', 'DD-MM-YYYY')
+  6   group by co.typecompte,  operation ;
+
+no rows selected
+
+
+Execution Plan
+----------------------------------------------------------                                                                                                                                              
+Plan hash value: 383510784                                                                                                                                                                              
+                                                                                                                                                                                                        
+-------------------------------------------------------------------------------------                                                                                                                   
+| Id  | Operation             | Name        | Rows  | Bytes | Cost (%CPU)| Time     |                                                                                                                   
+-------------------------------------------------------------------------------------                                                                                                                   
+|   0 | SELECT STATEMENT      |             |     3 |   120 |  4915K  (1)| 00:03:13 |                                                                                                                   
+|   1 |  HASH GROUP BY        |             |     3 |   120 |  4915K  (1)| 00:03:13 |                                                                                                                   
+|   2 |   MERGE JOIN CARTESIAN|             |  1319M|    49G|  4886K  (1)| 00:03:11 |                                                                                                                   
+|*  3 |    TABLE ACCESS FULL  | TRANSACTION | 36323 |   709K|  1026   (1)| 00:00:01 |                                                                                                                   
+|   4 |    BUFFER SORT        |             | 36323 |   709K|  4914K  (1)| 00:03:12 |                                                                                                                   
+|*  5 |     TABLE ACCESS FULL | COMPTE      | 36323 |   709K|   135   (1)| 00:00:01 |                                                                                                                   
+-------------------------------------------------------------------------------------                                                                                                                   
+                                                                                                                                                                                                        
+Predicate Information (identified by operation id):                                                                                                                                                     
+---------------------------------------------------                                                                                                                                                     
+                                                                                                                                                                                                        
+   3 - filter("TR"."DATE_OPERATION"<=TO_DATE(' 2010-01-27 00:00:00',                                                                                                                                    
+              'syyyy-mm-dd hh24:mi:ss') AND "TR"."DATE_OPERATION">=TO_DATE(' 2010-01-25                                                                                                                 
+              00:00:00', 'syyyy-mm-dd hh24:mi:ss'))                                                                                                                                                     
+   5 - filter("CO"."CLIENTID" IS NOT NULL)                                                                                                                                                              
+                                                                                                                                                                                                        
+SQL Analysis Report (identified by operation id/Query Block Name/Object Alias):                                                                                                                         
+-------------------------------------------------------------------------------                                                                                                                         
+                                                                                                                                                                                                        
+   1 -  SEL$85E3273F                                                                                                                                                                                    
+           -  The query block has 1 cartesian product which may be                                                                                                                                      
+              expensive. Consider adding join conditions or removing the                                                                                                                                
+              disconnected tables or views.                                                                                                                                                             
+
+
+Statistics
+----------------------------------------------------------                                                                                                                                              
+         22  recursive calls                                                                                                                                                                            
+          0  db block gets                                                                                                                                                                              
+       3711  consistent gets                                                                                                                                                                            
+          0  physical reads                                                                                                                                                                             
+          0  redo size                                                                                                                                                                                  
+        578  bytes sent via SQL*Net to client                                                                                                                                                           
+         83  bytes received via SQL*Net from client                                                                                                                                                     
+          1  SQL*Net roundtrips to/from client                                                                                                                                                          
+          0  sorts (memory)                                                                                                                                                                             
+          0  sorts (disk)                                                                                                                                                                               
+          0  rows processed                                                                                                                                                                             
+
+SQL> 
+SQL>  set autotrace off
+SQL> 
+SQL> -- Connexion avec lau niveau CDB pour prendre un clich� AWR
+SQL> -- La gestion des statistiques se fait au niveau e ma CDB
+SQL> connect &MYCDBUSER@&DBALIASCDB/&MYCDBUSERPASS
+ERROR:
+ORA-01017: invalid credential or not authorized; logon denied
+Help: https://docs.oracle.com/error-help/db/ora-01017/ 
+
+
+Warning: You are no longer connected to ORACLE.
+SQL> 
+SQL> 
+SQL> -- Prendre un deuxi�me clich� AWR pour d�limiter
+SQL> -- la fin de l'espace de r�cup�ration des requ�tes.
+SQL> variable snapid2 number;
+SQL> set serveroutput on
+SQL> 
+SQL> begin
+  2  	     :snapid2	     := dbms_workload_repository.create_snapshot;
+  3  	     dbms_output.put_line('snap_id2='||:snapid2);
+  4  end;
+  5  /
+SP2-0640: Not connected
+Help: https://docs.oracle.com/error-help/db/sp2-0640/
+SQL> 
+SQL> -- ReConnexion � la  PDB pour utiliser STA
+SQL> connect &MYPDBUSER@&DBALIASPDB/&MYPDBUSERPASS
+Connected.
+SQL> set arraysize 5000
+SQL> -- reporter le num�ro de clich� rendu par le programme ici :
+SQL> -- snap_id2= 154 ? snap_id2=744
+SQL> 
+SQL> -- Supprimer la tache
+SQL> -- Supprimer 1 tache BANK_SQL_TUNING_TASK si elle existe d�j�
+SQL> execute DBMS_SQLTUNE.DROP_TUNING_TASK('BANK_SQL_TUNING_TASK'||'&MYPDBUSER');
+
+PL/SQL procedure successfully completed.
+
+SQL> execute DBMS_SQLTUNE.DROP_SQLSET('bank_sql_tuning_set'||'&MYPDBUSER');
+
+PL/SQL procedure successfully completed.
+
+SQL> -- Si vous avez d�j� ex�cut� ce script, il se peut qu'un
+SQL> -- qu'un profile de requ�te ai d�j� �t� cr��. Dans ce cas:
+SQL> -- Rechercher puis supprimer le profie s'il existe d�j�
+SQL> ---
+SQL> set linesize 200
+SQL> col sql_text format A40
+SQL> select name
+  2  from dba_sql_profiles
+  3  order by name;
+
+no rows selected
+
+SQL> 
+SQL> -- Supprimer le(s) profile(s) s'ils ont �t� trouv�s avec la requ�te
+SQL> -- pr�c�dente. NomProfile est le r�sultat de la requ�te
+SQL> -- ci-dessus. R�p�ter l'action si utile.
+SQL> execute DBMS_SQLTUNE.DROP_SQL_PROFILE('NomProfile');
+BEGIN DBMS_SQLTUNE.DROP_SQL_PROFILE('NomProfile'); END;
+
+*
+ERROR at line 1:
+ORA-13833: SQL profile or patch named NomProfile doesn't exist
+ORA-06512: at "SYS.DBMS_SQLTUNE_INTERNAL", line 19619
+ORA-06512: at "SYS.PRVT_SQLPROF_INFRA", line 48
+ORA-06512: at "SYS.DBMS_SQLTUNE", line 11806
+ORA-06512: at line 1
+Help: https://docs.oracle.com/error-help/db/ora-13833/ 
+
+
+SQL> 
+SQL> -- 3. G�n�rer les recommandations
+SQL> -- Ex�cuter le script ci-dessous pour optimiser automatiquement
+SQL> -- les requ�tes lanc�es entre snap_id1 et snap_id2.
+SQL> -- Le conseiller qui sera utilis� ici est SQL TUNNING ADVISOR.
+SQL> set serveroutput on
+SQL> DECLARE
+  2  my_task_name VARCHAR2(30);
+  3  nom_sqlset varchar2(50):='bank_sql_tuning_set'||'&MYPDBUSER';
+  4  l_cursor  DBMS_SQLTUNE.sqlset_cursor;
+  5  BEGIN
+  6  DBMS_SQLTUNE.CREATE_SQLSET(
+  7  sqlset_name => nom_sqlset,
+  8  description => 'I/O intensive workload');
+  9  
+ 10  -- Appel de la fonction DBMS_SQLTUNE.select_workload_repository
+ 11  -- pour recolter les requ�tes � r�gler automatiquement entre
+ 12  -- snap_id1 et snap_id2.
+ 13  -- remplacer snap_id1 et snap_id2 par les valeurs captur�es
+ 14  -- plus haut apr�s les appels de:dbms_workload_repository.create_snapshot;.
+ 15  --1059 et 1174
+ 16    OPEN l_cursor FOR
+ 17  	 SELECT VALUE(p)
+ 18  	 FROM	TABLE (DBMS_SQLTUNE.select_workload_repository (
+ 19  			 :snapid1, --snap_id1,	-- begin_snap :
+ 20  			 :snapid2, --snap_id2,	-- end_snap
+ 21  			 'parsing_schema_name =''&MYPDBUSER''  and parsing_schema_name <> ''SYS''', -- basic_filter
+ 22  			 NULL, -- object_filter
+ 23  			 NULL, -- ranking_measure1
+ 24  			 NULL, -- ranking_measure2
+ 25  			 NULL, -- ranking_measure3
+ 26  			 NULL, -- result_percentage
+ 27  					     NULL, -- result_limit
+ 28  					     'ALL' -- attribute_list
+ 29  					     )
+ 30  		     --    10)	 -- result_limit
+ 31  		       ) p;
+ 32  
+ 33  -- charger les requ�tes recolt�es entre snap_id1 et snap_id2
+ 34  -- actuellement pr�sente dans l_cursor dans le sql tuning
+ 35  -- set cr�� pr�c�demment.
+ 36    DBMS_SQLTUNE.load_sqlset (
+ 37  	 sqlset_name	 => nom_sqlset,
+ 38  	 populate_cursor => l_cursor);
+ 39  
+ 40  -- cr�er une t�che de tuning pour le sql tuning set
+ 41  -- aliment� en requ�te dans l'action ci-dessus.
+ 42  my_task_name := DBMS_SQLTUNE.CREATE_TUNING_TASK(
+ 43  sqlset_name => nom_sqlset,
+ 44  basic_filter => 'parsing_schema_name =''&MYPDBUSER''', -- basic_filter
+ 45  scope => 'COMPREHENSIVE',
+ 46  time_limit => 60,
+ 47  task_name => 'BANK_SQL_TUNING_TASK'||'&MYPDBUSER',
+ 48  description => 'Task to tune a query on a specified bank queries'
+ 49  );
+ 50  
+ 51  -- Ex�cuter le t�che de tuning
+ 52  -- le conseiller utilis� ici est STA.
+ 53  DBMS_SQLTUNE.EXECUTE_TUNING_TASK( task_name => my_task_name );
+ 54  
+ 55  END;
+ 56  /
+old   3: nom_sqlset varchar2(50):='bank_sql_tuning_set'||'&MYPDBUSER';
+new   3: nom_sqlset varchar2(50):='bank_sql_tuning_set'||'ORS2';
+old  21:                     'parsing_schema_name =''&MYPDBUSER''  and parsing_schema_name <> ''SYS''', -- basic_filter
+new  21:                     'parsing_schema_name =''ORS2''  and parsing_schema_name <> ''SYS''', -- basic_filter
+old  44: basic_filter => 'parsing_schema_name =''&MYPDBUSER''', -- basic_filter
+new  44: basic_filter => 'parsing_schema_name =''ORS2''', -- basic_filter
+old  47: task_name => 'BANK_SQL_TUNING_TASK'||'&MYPDBUSER',
+new  47: task_name => 'BANK_SQL_TUNING_TASK'||'ORS2',
+
+PL/SQL procedure successfully completed.
+
+SQL> 
+SQL> -- profile des fonctions utilis�es dans le programme ci-dessus.
+SQL> -- A ne pas ex�cuter. Voir le manuel Oracle Oracle� Database
+SQL> -- PL/SQL Packages and Types Reference pour la description
+SQL> -- d�taill�e.
+SQL> /*
+SQL> DBMS_SQLTUNE.SELECT_WORKLAOD_REPOSITORY (
+SQL> begin_snap IN NUMBER,
+SQL> end_snap IN NUMBER,
+SQL> basic_filter IN VARCHAR2 := NULL,
+SQL> object_filter IN VARCHAR2 := NULL,
+SQL> ranking_measure1 IN VARCHAR2 := NULL,
+SQL> ranking_measure2 IN VARCHAR2 := NULL,
+SQL> ranking_measure3 IN VARCHAR2 := NULL,
+SQL> result_percentage IN NUMBER := 1,
+SQL> result_limit IN NUMBER := NULL
+SQL> attribute_list IN VARCHAR2 := NULL)
+SQL> RETURN sys.sqlset PIPELINED;
+SQL> 
+SQL> 
+SQL> DBMS_SQLTUNE.CREATE_TUNING_TASK(
+SQL> sqlset_name IN VARCHAR2,
+SQL> basic_filter IN VARCHAR2 := NULL,
+SQL> object_filter IN VARCHAR2 := NULL,
+SQL> rank1 IN VARCHAR2 := NULL,
+SQL> rank2 IN VARCHAR2 := NULL,
+SQL> rank3 IN VARCHAR2 := NULL,
+SQL> result_percentage IN NUMBER := NULL,
+SQL> result_limit IN NUMBER := NULL,
+SQL> scope IN VARCHAR2 := SCOPE_COMPREHENSIVE,
+SQL> time_limit IN NUMBER := TIME_LIMIT_DEFAULT,
+SQL> task_name IN VARCHAR2 := NULL,
+SQL> description IN VARCHAR2 := NULL
+SQL> plan_filter IN VARCHAR2 := 'MAX_ELAPSED_TIME',
+SQL> sqlset_owner IN VARCHAR2 := NULL)
+SQL> RETURN VARCHAR2;
+SQL> 
+SQL> */
+SQL> 
+SQL> 
+SQL> 
+SQL> -- 4. Afficher les r�sultats d'analyses
+SQL> 
+SQL> -- Consultation des informations sur la tache
+SQL> 
+SQL> -- V�rification de la t�che cr��e
+SQL> col task_name format a20
+SQL> SELECT task_name
+  2  FROM DBA_ADVISOR_LOG
+  3  WHERE owner ='ORS2' and task_name='BANK_SQL_TUNING_TASK'||'&MYPDBUSER';
+old   3: WHERE owner ='ORS2' and task_name='BANK_SQL_TUNING_TASK'||'&MYPDBUSER'
+new   3: WHERE owner ='ORS2' and task_name='BANK_SQL_TUNING_TASK'||'ORS2'
+
+TASK_NAME                                                                                                                                                                                               
+--------------------                                                                                                                                                                                    
+BANK_SQL_TUNING_TASK                                                                                                                                                                                    
+ORS2                                                                                                                                                                                                    
+                                                                                                                                                                                                        
+
+SQL> 
+SQL> --?
+SQL> 
+SQL> -- La vue Advisor_tasks contient des informations
+SQL> -- sur les t�ches
+SQL> 
+SQL> SELECT TASK_NAME, ADVISOR_NAME, status , RECOMMENDATION_COUNT, SOURCE
+  2  FROM USER_ADVISOR_TASKS
+  3  WHERE task_name = 'BANK_SQL_TUNING_TASK'||'&MYPDBUSER';
+old   3: WHERE task_name = 'BANK_SQL_TUNING_TASK'||'&MYPDBUSER'
+new   3: WHERE task_name = 'BANK_SQL_TUNING_TASK'||'ORS2'
+
+TASK_NAME            ADVISOR_NAME                                                                                                                     STATUS      RECOMMENDATION_COUNT                  
+-------------------- -------------------------------------------------------------------------------------------------------------------------------- ----------- --------------------                  
+SOURCE                                                                                                                                                                                                  
+--------------------------------------------------------------------------------------------------------------------------------                                                                        
+BANK_SQL_TUNING_TASK SQL Tuning Advisor                                                                                                               COMPLETED                      0                  
+ORS2                                                                                                                                                                                                    
+PRIMARY                                                                                                                                                                                                 
+                                                                                                                                                                                                        
+
+SQL> 
+SQL> --?
+SQL> 
+SQL> -- La vue V$ADVISOR_PROGRESS contient des informations
+SQL> -- sur la progression des t�ches
+SQL> 
+SQL> -- Exemple de consultation de la progression
+SQL> 
+SQL> SELECT sofar, totalwork FROM
+  2  V$ADVISOR_PROGRESS  vp,
+  3  DBA_ADVISOR_LOG da
+  4  WHERE vp.username = '&MYPDBUSER'
+  5  AND vp.task_id=da.task_id
+  6  AND da.task_name = 'BANK_SQL_TUNING_TASK'||'&MYPDBUSER';
+old   4: WHERE vp.username = '&MYPDBUSER'
+new   4: WHERE vp.username = 'ORS2'
+old   6: AND da.task_name = 'BANK_SQL_TUNING_TASK'||'&MYPDBUSER'
+new   6: AND da.task_name = 'BANK_SQL_TUNING_TASK'||'ORS2'
+
+no rows selected
+
+SQL> 
+SQL> --?
+SQL> 
+SQL> --La fonction DBMS_SQLTUNE.REPORT_TUNING_TASK permet d'afficher
+SQL> --le r�sultat d'une analyse
+SQL> 
+SQL> 
+SQL> SET LONG 4000
+SQL> SET LONGCHUNKSIZE 4000
+SQL> SET LINESIZE 200
+SQL> SELECT DBMS_SQLTUNE.REPORT_TUNING_TASK( 'BANK_SQL_TUNING_TASK'||'&MYPDBUSER')
+  2  FROM DUAL;
+old   1: SELECT DBMS_SQLTUNE.REPORT_TUNING_TASK( 'BANK_SQL_TUNING_TASK'||'&MYPDBUSER')
+new   1: SELECT DBMS_SQLTUNE.REPORT_TUNING_TASK( 'BANK_SQL_TUNING_TASK'||'ORS2')
+
+DBMS_SQLTUNE.REPORT_TUNING_TASK('BANK_SQL_TUNING_TASK'||'ORS2')                                                                                                                                         
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+GENERAL INFORMATION SECTION                                                                                                                                                                             
+-------------------------------------------------------------------------------                                                                                                                         
+Tuning Task Name                  : BANK_SQL_TUNING_TASKORS2                                                                                                                                            
+Tuning Task Owner                 : ORS2                                                                                                                                                                
+Workload Type                     : SQL Tuning Set                                                                                                                                                      
+Scope                             : COMPREHENSIVE                                                                                                                                                       
+Time Limit(seconds)               : 60                                                                                                                                                                  
+Completion Status                 : COMPLETED                                                                                                                                                           
+Started at                        : 03/28/2026 04:32:34                                                                                                                                                 
+Completed at                      : 03/28/2026 04:32:34                                                                                                                                                 
+SQL Tuning Set (STS) Name         : bank_sql_tuning_setORS2                                                                                                                                             
+SQL Tuning Set Owner              : ORS2                                                                                                                                                                
+Number of Statements in the STS   : 0                                                                                                                                                                   
+                                                                                                                                                                                                        
+-------------------------------------------------------------------------------                                                                                                                         
+                                                                                                                                                                                                        
+                                                                                                                                                                                                        
+
+SQL> 
+SQL> 
+SQL> --?
+SQL> 
+SQL> -- r�sultat du report il est conseill�e de restructurer la
+SQL> -- requ�te.
+SQL> 
+SQL> --?
+SQL> 
+SQL> -- la ligne ci-dessous dans le rapport indique qu'il y'a une
+SQL> -- restructuration de la requete � faire.
+SQL> -- Number of SQL Restructure Findings: 1
+SQL> 
+SQL> --
+SQL> -- Type de recommandation
+SQL> -- Consulter le type de recommandation dans la vue
+SQL> -- DBA_ADVISOR_RECOMMENDATIONS
+SQL> --
+SQL> 
+SQL> col task_name format A20
+SQL> col PARENT_REC_IDS format A40
+SQL> col vs.SQL_TEXT format a60
+SQL> col reco_type format A20
+SQL> set linesize 200
+SQL> set pagesize 400
+SQL> 
+SQL> 
+SQL> select distinct dar.task_name,  vs.sql_id, vs.SQL_TEXT, dar.type reco_type  , BENEFIT
+  2  from v$sqlarea vs,
+  3  DBA_ADVISOR_SQLPLANS da,
+  4  DBA_ADVISOR_RECOMMENDATIONS dar
+  5  where vs.sql_id=da.sql_id
+  6  and da.task_id=dar.task_id
+  7  and dar.task_name='BANK_SQL_TUNING_TASK'||'&MYPDBUSER'
+  8  and sql_text not like '%EXPLAIN%'
+  9  and sql_text not like '%opt_param%'
+ 10  and sql_text not like '%insert%'
+ 11  and sql_text not like '%V_$SESSTAT%'
+ 12  and sql_text not like '%PLAN_TABLE%'
+ 13  order by dar.task_name,  vs.sql_id, reco_type;
+old   7: and dar.task_name='BANK_SQL_TUNING_TASK'||'&MYPDBUSER'
+new   7: and dar.task_name='BANK_SQL_TUNING_TASK'||'ORS2'
+
+no rows selected
+
+SQL> 
+SQL> 
+SQL> --?
+SQL> 
+SQL> --
+SQL> -- Consultation la description du probl�me trouv� par STA
+SQL> -- Dans la vue DBA_ADVISOR_FINDINGS
+SQL> -- R�sultation de la recherche
+SQL> ---
+SQL> 
+SQL> col task_name format A10
+SQL> col message format A40
+SQL> col more_info format A40
+SQL> col impact_type format A40
+SQL> col vs.SQL_TEXT format a40
+SQL> set linesize 300
+SQL> set pagesize 400
+SQL> 
+SQL> select distinct dar.task_name,  da.object_id, vs.sql_id, vs.SQL_TEXT, MESSAGE, impact_type, more_info
+  2  from v$sqlarea vs,
+  3  DBA_ADVISOR_SQLPLANS da,
+  4  DBA_ADVISOR_FINDINGS dar
+  5  where vs.sql_id=da.sql_id
+  6  and da.task_id=dar.task_id
+  7  and da.object_id=dar.object_id
+  8  and dar.task_name='BANK_SQL_TUNING_TASK'||'&MYPDBUSER'
+  9  and sql_text not like '%EXPLAIN%'
+ 10  and sql_text not like '%opt_param%'
+ 11  and sql_text not like '%insert%'
+ 12  and sql_text not like '%V_$SESSTAT%'
+ 13  and sql_text not like '%PLAN_TABLE%'
+ 14  order by dar.task_name,  da.object_id, vs.sql_id;
+old   8: and dar.task_name='BANK_SQL_TUNING_TASK'||'&MYPDBUSER'
+new   8: and dar.task_name='BANK_SQL_TUNING_TASK'||'ORS2'
+
+no rows selected
+
+SQL> 
+SQL> 
+SQL> 
+SQL> --?
+SQL> 
+SQL> ---
+SQL> --- recommandation
+SQL> --- consulter les actions (diagnostic) recommand�es par STA
+SQL> --- dans la vue DBA_ADVISOR_ACTIONS
+SQL> ---
+SQL> -- voir
+SQL> col task_name format A20
+SQL> col message format A40
+SQL> col more_info format A40
+SQL> col impact_type format A40
+SQL> col SQL_TEXT format a40
+SQL> 
+SQL> set linesize 200
+SQL> set pagesize 400
+SQL> 
+SQL> 
+SQL> select distinct dar.task_name,  da.object_id, vs.sql_id, vs.SQL_TEXT, message
+  2  from v$sqlarea vs,
+  3  DBA_ADVISOR_SQLPLANS da,
+  4  DBA_ADVISOR_ACTIONS dar
+  5  where vs.sql_id=da.sql_id
+  6  and da.task_id=dar.task_id
+  7  and da.object_id=dar.object_id
+  8  and dar.task_name='BANK_SQL_TUNING_TASK'||'&MYPDBUSER'
+  9  and sql_text not like '%EXPLAIN%'
+ 10  and sql_text not like '%opt_param%'
+ 11  and sql_text not like '%insert%'
+ 12  and sql_text not like '%V_$SESSTAT%'
+ 13  and sql_text not like '%PLAN_TABLE%'
+ 14  order by dar.task_name, da.object_id, vs.sql_id;
+old   8: and dar.task_name='BANK_SQL_TUNING_TASK'||'&MYPDBUSER'
+new   8: and dar.task_name='BANK_SQL_TUNING_TASK'||'ORS2'
+
+no rows selected
+
+SQL> 
+SQL> --?
+SQL> 
+SQL> -- Liste des actions possibles
+SQL> set linesize 200
+SQL> col ATTR1 format a30
+SQL> col ATTR2 format a10
+SQL> col attr3 format a20
+SQL> col ATTR4 format a10
+SQL> col attr5 format a30
+SQL> 
+SQL> select
+  2  object_id,
+  3  ATTR1,
+  4  ATTR2,
+  5  ATTR3,
+  6  ATTR4,
+  7  ATTR5
+  8  from DBA_ADVISOR_ACTIONS
+  9  where attr1!='SYS'
+ 10  and attr1 not like '%SYSMAN%'
+ 11  order by object_id;
+
+ OBJECT_ID ATTR1                          ATTR2      ATTR3                ATTR4      ATTR5                                                                                                              
+---------- ------------------------------ ---------- -------------------- ---------- ------------------------------                                                                                     
+         0 session_cached_cursors         50                                                                                                                                                            
+         1 b6usrg82hwsa3                                                                                                                                                                                
+         1 c560tsz1ph50d                                                                                                                                                                                
+         2 gca1cw81ds7cu                                                                                                                                                                                
+
+SQL> 
+SQL> 
+SQL> ---
+SQL> --- Raisonnement
+SQL> --- Raisonnement avec des explications compl�mentaires sur
+SQL> --- le probl�me.
+SQL> --- Consult� pour cela la vue DBA_ADVISOR_RATIONALE
+SQL> ---
+SQL> 
+SQL> 
+SQL> 
+SQL> 
+SQL> 
+SQL> col task_name format A20
+SQL> col message format A40
+SQL> col more_info format A40
+SQL> col impact_type format A40
+SQL> col SQL_TEXT format a40
+SQL> set linesize 200
+SQL> set pagesize 400
+SQL> 
+SQL> 
+SQL> select distinct dar.task_name,  da.object_id, vs.sql_id, vs.SQL_TEXT, message
+  2  from v$sqlarea vs,
+  3  DBA_ADVISOR_SQLPLANS da,
+  4  DBA_ADVISOR_RATIONALE dar
+  5  where vs.sql_id=da.sql_id
+  6  and da.task_id=dar.task_id
+  7  and da.object_id=dar.object_id
+  8  and dar.task_name='BANK_SQL_TUNING_TASK'||'&MYPDBUSER'
+  9  and sql_text not like '%EXPLAIN%'
+ 10  and sql_text not like '%opt_param%'
+ 11  and sql_text not like '%insert%'
+ 12  and sql_text not like '%V_$SESSTAT%'
+ 13  and sql_text not like '%PLAN_TABLE%'
+ 14  order by dar.task_name,  da.object_id, vs.sql_id;
+old   8: and dar.task_name='BANK_SQL_TUNING_TASK'||'&MYPDBUSER'
+new   8: and dar.task_name='BANK_SQL_TUNING_TASK'||'ORS2'
+
+no rows selected
+
+SQL> --?
+SQL> 
+SQL> 
+SQL> 
+SQL> 
+SQL> 
+SQL> 
+SQL> --
+SQL> -- Rechercher s'il y'a des scripts g�n�r�s
+SQL> -- Identifier s'il ya un profile pour cette requ�te choisie plus
+SQL> -- haut.
+SQL> -- afficher le script complet ou partiel
+SQL> col myscript format a1000
+SQL> set long 4000
+SQL> select dbms_sqltune.SCRIPT_TUNING_TASK('BANK_SQL_TUNING_TASK'||'&MYPDBUSER', 'ALL') MYSCRIPT from dual;
+old   1: select dbms_sqltune.SCRIPT_TUNING_TASK('BANK_SQL_TUNING_TASK'||'&MYPDBUSER', 'ALL') MYSCRIPT from dual
+new   1: select dbms_sqltune.SCRIPT_TUNING_TASK('BANK_SQL_TUNING_TASK'||'ORS2', 'ALL') MYSCRIPT from dual
+
+MYSCRIPT                                                                                                                                                                                                
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+There are no recommended actions for this task under the given filters.                                                                                                                                 
+                                                                                                                                                                                                        
+                                                                                                                                                                                                        
+
+SQL> 
+SQL> select dbms_sqltune.SCRIPT_TUNING_TASK('BANK_SQL_TUNING_TASK'||'&MYPDBUSER', 'INDEXES') MYSCRIPT from dual;
+old   1: select dbms_sqltune.SCRIPT_TUNING_TASK('BANK_SQL_TUNING_TASK'||'&MYPDBUSER', 'INDEXES') MYSCRIPT from dual
+new   1: select dbms_sqltune.SCRIPT_TUNING_TASK('BANK_SQL_TUNING_TASK'||'ORS2', 'INDEXES') MYSCRIPT from dual
+
+MYSCRIPT                                                                                                                                                                                                
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+There are no recommended actions for this task under the given filters.                                                                                                                                 
+                                                                                                                                                                                                        
+                                                                                                                                                                                                        
+
+SQL> select dbms_sqltune.SCRIPT_TUNING_TASK('BANK_SQL_TUNING_TASK'||'&MYPDBUSER', 'PROFILES') MYSCRIPT from dual;
+old   1: select dbms_sqltune.SCRIPT_TUNING_TASK('BANK_SQL_TUNING_TASK'||'&MYPDBUSER', 'PROFILES') MYSCRIPT from dual
+new   1: select dbms_sqltune.SCRIPT_TUNING_TASK('BANK_SQL_TUNING_TASK'||'ORS2', 'PROFILES') MYSCRIPT from dual
+
+MYSCRIPT                                                                                                                                                                                                
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+There are no recommended actions for this task under the given filters.                                                                                                                                 
+                                                                                                                                                                                                        
+                                                                                                                                                                                                        
+
+SQL> select dbms_sqltune.SCRIPT_TUNING_TASK('BANK_SQL_TUNING_TASK'||'&MYPDBUSER', 'STATISTICS') MYSCRIPT from dual;
+old   1: select dbms_sqltune.SCRIPT_TUNING_TASK('BANK_SQL_TUNING_TASK'||'&MYPDBUSER', 'STATISTICS') MYSCRIPT from dual
+new   1: select dbms_sqltune.SCRIPT_TUNING_TASK('BANK_SQL_TUNING_TASK'||'ORS2', 'STATISTICS') MYSCRIPT from dual
+
+MYSCRIPT                                                                                                                                                                                                
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+There are no recommended actions for this task under the given filters.                                                                                                                                 
+                                                                                                                                                                                                        
+                                                                                                                                                                                                        
+
+SQL> 
+SQL> -- une autre fa�on d'afficher le script complet
+SQL> set serveroutput on
+SQL> begin
+  2  dbms_output.put_line(dbms_sqltune.SCRIPT_TUNING_TASK('BANK_SQL_TUNING_TASK'||'&MYPDBUSER', 'ALL'));
+  3  end;
+  4  /
+old   2: dbms_output.put_line(dbms_sqltune.SCRIPT_TUNING_TASK('BANK_SQL_TUNING_TASK'||'&MYPDBUSER', 'ALL'));
+new   2: dbms_output.put_line(dbms_sqltune.SCRIPT_TUNING_TASK('BANK_SQL_TUNING_TASK'||'ORS2', 'ALL'));
+There are no recommended actions for this task under the given filters. 
+                                                                                                                              
+
+
+PL/SQL procedure successfully completed.
+
+SQL> --?
+SQL> 
+SQL> -- 5. G�rer le script SQL propos� pour le r�glage SQL
+SQL> -- G�rer le script SQL propos� pour le r�glage SQL : Attention ce script est disponible dans le dossier %ORACLE_BASE%\admin\dpdump
+SQL> -- r�cup�rer le script et le mettre dans votre dossier : EXO91
+SQL> -- Editer ce script de fa�on appropri�
+SQL> declare
+  2  mydate varchar2(20):=to_char(sysdate, 'DD_MM_YYYY_HH24_MI_SS');
+  3  fname varchar2(300):='STA_Generate_action_script_on_bank_app_'
+  4  ||'&MYPDBUSER'|| '_'||mydate||'.sql';
+  5  begin
+  6  
+  7  DBMS_ADVISOR.CREATE_FILE(
+  8  DBMS_SQLTUNE.SCRIPT_TUNING_TASK('BANK_SQL_TUNING_TASK'||'&MYPDBUSER'),
+  9  'DATA_PUMP_DIR',
+ 10  fname
+ 11  );
+ 12  end;
+ 13  /
+old   4: ||'&MYPDBUSER'|| '_'||mydate||'.sql';
+new   4: ||'ORS2'|| '_'||mydate||'.sql';
+old   8: DBMS_SQLTUNE.SCRIPT_TUNING_TASK('BANK_SQL_TUNING_TASK'||'&MYPDBUSER'),
+new   8: DBMS_SQLTUNE.SCRIPT_TUNING_TASK('BANK_SQL_TUNING_TASK'||'ORS2'),
+
+PL/SQL procedure successfully completed.
+
+SQL> 
+SQL> -- ex�cuter le script pour accepter le profile de la requ�te choisie
+SQL> 
+SQL> -- execute dbms_sqltune.accept_sql_profile(task_name => 'BANK_SQL_TUNING_TASK'||'&MYPDBUSER', replace => TRUE);
+SQL> 
+SQL> ---
+SQL> --- V�rifier la pr�sence d'un profie dans la vue
+SQL> ---
+SQL> set linesize 200
+SQL> 
+SQL> col sql_text format A40
+SQL> select name ,CATEGORY,  SQL_TEXT , STATUS,FORCE_MATCHING
+  2  from dba_sql_profiles
+  3  order by name;
+
+no rows selected
+
+SQL> 
+SQL> 
+SQL> SPOOL OFF

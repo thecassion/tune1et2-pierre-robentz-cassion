@@ -1,0 +1,92 @@
+SQL> define SCRIPTPATH=/opt/oracle/scripts/TP_TUNE2_MODELE_2025_2026/ScriptsTune2/EXO31_41
+SQL> 
+SQL> -- D�finir la variable contenant le nom de l'instance
+SQL> -- define MYINSTANCE=DBTEST12
+SQL> define MYINSTANCE=FREE
+SQL> 
+SQL> -- D�finir la vairiable qui va contenir le nom r�seau de votre base PDB.
+SQL> -- Le nom r�seau se dans le fichier tnsnames.ora
+SQL> -- Il est disponible dans le dossier : %ORACLE_HOME%\network\admin
+SQL> -- define DBALIASPDB=PDBORCL
+SQL> 
+SQL> define DBALIASPDB=FREEPDB1
+SQL> 
+SQL> 
+SQL> -- D�finir la vairiable qui va contenir le nom r�seau de votre base CDB.
+SQL> -- Le nom r�seau se dans le fichier tnsnames.ora
+SQL> -- Il est disponible dans le dossier : %ORACLE_HOME%\network\admin
+SQL> define DBALIASCDB=FREE
+SQL> 
+SQL> -- D�finir la variable contenant le nom de l'utilisateur que vous allez
+SQL> -- utiliser au niveau CDB.
+SQL> define MYCDBUSER=SYSTEM
+SQL> 
+SQL> -- D�finir la variable contenant le pass de l'utilisateur que vous allez
+SQL> -- utiliser au niveau CDB.
+SQL> define MYCDBUSERPASS=Oracle123
+SQL> 
+SQL> -- D�finir la variable contenant le nom de l'utilisateur que vous allez
+SQL> -- cr�er au niveau PDB ou utiliser s'il existe d�j�.
+SQL> define MYPDBUSER=ORS2
+SQL> 
+SQL> -- D�finir la variable contenant le pass de l'utilisateur que vous allez
+SQL> -- cr�er au niveau PDB ou utiliser s'il existe d�j�.
+SQL> define MYPDBUSERPASS=PassOrs2
+SQL> 
+SQL> -- D�finir la variable contenant la trace que vous souhaitez :
+SQL> -- ON : si affiche r�sultat+plan
+SQL> -- TRACEONLY : si affichage plan uniquement
+SQL> define TRACEOPTION=TRACEONLY
+SQL> 
+SQL> -- Se connecter avec votre compte CDB dans la PDB pour cr�er l'utilisateur
+SQL> -- &MYPDBUSER
+SQL> --
+SQL> connect &MYCDBUSER@&DBALIASPDB/&MYCDBUSERPASS
+Connected.
+SQL> 
+SQL> -- suprimer l'utilisateur s'il existe d�j�
+SQL> drop user &MYPDBUSER cascade;
+old   1: drop user &MYPDBUSER cascade
+new   1: drop user ORS2 cascade
+
+User dropped.
+
+SQL> 
+SQL> -- Cr�ation de l'utilisateur.
+SQL> create user &MYPDBUSER identified by &MYPDBUSERPASS
+  2  default tablespace users
+  3  temporary tablespace temp;
+old   1: create user &MYPDBUSER identified by &MYPDBUSERPASS
+new   1: create user ORS2 identified by PassOrs2
+
+User created.
+
+SQL> 
+SQL> -- affecter et enlever des droits
+SQL> grant dba to &MYPDBUSER;
+old   1: grant dba to &MYPDBUSER
+new   1: grant dba to ORS2
+
+Grant succeeded.
+
+SQL> 
+SQL> revoke unlimited tablespace from &MYPDBUSER;
+old   1: revoke unlimited tablespace from &MYPDBUSER
+new   1: revoke unlimited tablespace from ORS2
+
+Revoke succeeded.
+
+SQL> 
+SQL> alter user &MYPDBUSER quota unlimited on users;
+old   1: alter user &MYPDBUSER quota unlimited on users
+new   1: alter user ORS2 quota unlimited on users
+
+User altered.
+
+SQL> 
+SQL> -- Connexion avec le nouvel utilisateur ou un utilisateur existant au niveau
+SQL> -- PDB.
+SQL> connect &MYPDBUSER@&DBALIASPDB/&MYPDBUSERPASS
+Connected.
+SQL> 
+SQL> @&SCRIPTPATH/EX31b_TUNE2_ACTIVITY.SQL

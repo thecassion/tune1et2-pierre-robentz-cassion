@@ -1,0 +1,819 @@
+Trace file C:\INSTALLATIONS\ORACLE21C\diag\rdbms\cours21c\cours21c\trace\cours21c_ora_10928.trc
+Oracle Database 21c Enterprise Edition Release 21.0.0.0.0 - Production
+Version 21.3.0.0.0
+Build label:    RDBMS_21.3.0.0.0_WINDOWS.X64_210927
+Windows NT Version V10.0  OS Build 19044
+ORACLE_HOME = C:\Logiciels\9_ORACLE21C\WINDOWS.X64_213000_db_home
+Node name           : PC-GABRIEL
+CPU                 : 16 - type 86648 physical cores
+Process Affinity    : 0x0000000000000000
+Memory (Avail/Total): Ph:53150M/65350M, Ph+PgF:41443M/75078M 
+Instance name: cours21c
+Redo thread mounted by this instance: 1
+Oracle process number: 0
+Windows thread id: 10928, image: 
+
+
+*** 2022-01-25T04:23:07.452571+01:00 (CDB$ROOT(1))
+2022-01-25 04:23:07.452 : fsd_notify_cb: FsDirect not implemented
+
+*** 2022-01-25T04:34:25.996319+01:00 (PDBMBDS(3))
+*** SESSION ID:(984.26613) 2022-01-25T04:34:25.997283+01:00
+*** SERVICE NAME:(pdbmbds) 2022-01-25T04:34:25.997283+01:00
+*** MODULE NAME:(SQL*Plus) 2022-01-25T04:34:25.997283+01:00
+*** ACTION NAME:() 2022-01-25T04:34:25.997283+01:00
+*** CLIENT DRIVER:(SQL*PLUS) 2022-01-25T04:34:25.997283+01:00
+*** CONTAINER ID:(3) 2022-01-25T04:34:25.997283+01:00
+*** CLIENT IP:(127.0.0.1) 2022-01-25T04:34:25.997283+01:00
+ 
+CLOSE #2263354018400:c=0,e=4,dep=1,type=1,tim=307947128893
+=====================
+PARSING IN CURSOR #2263330417016 len=49 dep=0 uid=109 oct=47 lid=109 tim=307947130306 hv=2024635897 ad='7ff77f19ae38' sqlid='cwaqbn9wauzgt'
+BEGIN sys.dbms_session.set_sql_trace(true); END;
+
+END OF STMT
+EXEC #2263330417016:c=0,e=1645,p=0,cr=0,cu=0,mis=1,r=1,dep=0,og=1,plh=0,tim=307947130306
+*** SESSION ID:(984.26613) 2022-01-25T04:34:26.001275+01:00
+*** CONTAINER ID:(3) 2022-01-25T04:34:26.001275+01:00
+*** CLIENT IP:(127.0.0.1) 2022-01-25T04:34:26.001275+01:00
+ 
+CLOSE #2263330417016:c=0,e=8,dep=0,type=0,tim=307947133803
+=====================
+PARSING IN CURSOR #2263330417016 len=40 dep=0 uid=109 oct=3 lid=109 tim=307947134889 hv=1109423342 ad='7ff783c0ee20' sqlid='gy9gs2d120x7f'
+select ename
+from emp
+where ename='KING'
+END OF STMT
+PARSE #2263330417016:c=0,e=997,p=0,cr=0,cu=0,mis=1,r=0,dep=0,og=1,plh=4030948918,tim=307947134889
+EXEC #2263330417016:c=0,e=246,p=0,cr=0,cu=0,mis=0,r=0,dep=0,og=1,plh=4030948918,tim=307947135180
+FETCH #2263330417016:c=0,e=9,p=0,cr=1,cu=0,mis=0,r=1,dep=0,og=1,plh=4030948918,tim=307947135218
+FETCH #2263330417016:c=0,e=5,p=0,cr=1,cu=0,mis=0,r=0,dep=0,og=1,plh=4030948918,tim=307947135363
+STAT #2263330417016 id=1 cnt=1 pid=0 pos=1 obj=77933 op='INDEX RANGE SCAN IDX_EMP_ENAME (cr=2 pr=0 pw=0 str=1 time=8 us cost=1 size=6 card=1)'
+*** SESSION ID:(984.26613) 2022-01-25T04:34:26.005280+01:00
+*** CONTAINER ID:(3) 2022-01-25T04:34:26.005280+01:00
+*** CLIENT IP:(127.0.0.1) 2022-01-25T04:34:26.005280+01:00
+ 
+CLOSE #2263330417016:c=0,e=2,dep=0,type=0,tim=307947137394
+=====================
+PARSING IN CURSOR #2263330417016 len=45 dep=0 uid=109 oct=7 lid=109 tim=307947137655 hv=349105966 ad='7ff783f5d990' sqlid='g72kdvcacxvtf'
+DELETE FROM PLAN_TABLE WHERE STATEMENT_ID=:1
+END OF STMT
+PARSE #2263330417016:c=0,e=151,p=0,cr=0,cu=0,mis=1,r=0,dep=0,og=1,plh=0,tim=307947137655
+=====================
+PARSING IN CURSOR #2263355541784 len=474 dep=1 uid=109 oct=3 lid=109 tim=307947138354 hv=229525032 ad='7ff76b589b38' sqlid='fau838w6uwjj8'
+SELECT /* OPT_DYN_SAMP */ /*+ ALL_ROWS IGNORE_WHERE_CLAUSE RESULT_CACHE(SNAPSHOT=3600) opt_param('parallel_execution_enabled', 'false') NO_PARALLEL(SAMPLESUB) NO_PARALLEL_INDEX(SAMPLESUB) NO_SQL_TUNE */ NVL(SUM(C1),0), NVL(SUM(C2),0) FROM (SELECT /*+ IGNORE_WHERE_CLAUSE NO_PARALLEL("PLAN_TABLE") FULL("PLAN_TABLE") NO_PARALLEL_INDEX("PLAN_TABLE") */ 1 AS C1, CASE WHEN "PLAN_TABLE"."STATEMENT_ID"=:B1 THEN 1 ELSE 0 END AS C2 FROM "SYS"."PLAN_TABLE$" "PLAN_TABLE") SAMPLESUB
+END OF STMT
+PARSE #2263355541784:c=0,e=367,p=0,cr=0,cu=0,mis=1,r=0,dep=1,og=1,plh=0,tim=307947138354
+EXEC #2263355541784:c=0,e=879,p=0,cr=0,cu=0,mis=1,r=0,dep=1,og=1,plh=1751138260,tim=307947139287
+FETCH #2263355541784:c=0,e=24,p=0,cr=3,cu=0,mis=0,r=1,dep=1,og=1,plh=1751138260,tim=307947139329
+STAT #2263355541784 id=1 cnt=1 pid=0 pos=1 obj=0 op='SORT AGGREGATE (cr=3 pr=0 pw=0 str=1 time=28 us)'
+STAT #2263355541784 id=2 cnt=0 pid=1 pos=1 obj=7848 op='TABLE ACCESS FULL PLAN_TABLE$ (cr=3 pr=0 pw=0 str=1 time=25 us cost=29 size=138856 card=8168)'
+CLOSE #2263355541784:c=0,e=3,dep=1,type=0,tim=307947139449
+EXEC #2263330417016:c=0,e=2038,p=0,cr=7,cu=0,mis=1,r=0,dep=0,og=1,plh=2637181423,tim=307947139735
+STAT #2263330417016 id=1 cnt=0 pid=0 pos=1 obj=0 op='DELETE  PLAN_TABLE$ (cr=3 pr=0 pw=0 str=1 time=16 us)'
+STAT #2263330417016 id=2 cnt=0 pid=1 pos=1 obj=7848 op='TABLE ACCESS FULL PLAN_TABLE$ (cr=3 pr=0 pw=0 str=1 time=13 us cost=2 size=17 card=1)'
+CLOSE #2263330417016:c=0,e=2,dep=0,type=0,tim=307947140380
+=====================
+PARSING IN CURSOR #2263330417016 len=87 dep=0 uid=109 oct=50 lid=109 tim=307947141061 hv=2128748835 ad='7ff763b7a8f8' sqlid='0vad7gdzf4893'
+EXPLAIN PLAN SET STATEMENT_ID='PLUS130410' FOR select ename
+from emp
+where ename='KING'
+END OF STMT
+PARSE #2263330417016:c=0,e=657,p=0,cr=0,cu=0,mis=1,r=0,dep=0,og=1,plh=4030948918,tim=307947141061
+=====================
+PARSING IN CURSOR #2263355541784 len=586 dep=1 uid=109 oct=2 lid=109 tim=307947141371 hv=2508123768 ad='7ff76a95aa58' sqlid='99qa3zyarxvms'
+insert into plan_table (statement_id, timestamp, operation, options,object_node, object_owner, object_name, object_instance, object_type,search_columns, id, parent_id, position, other,optimizer, cost, cardinality, bytes, other_tag, partition_start, partition_stop, partition_id, distribution, cpu_cost, io_cost, temp_space, access_predicates, filter_predicates, projection, time, qblock_name, object_alias, plan_id, depth, remarks, other_xml ) values(:1,:2,:3,:4,:5,:6,:7,:8,:9,:10,:11,:12,:13,:14,:15,:16,:17,:18,:19,:20,:21,:22,:23,:24,:25,:26,:27,:28,:29,:30,:31,:32,:33,:34,:35,:36)
+END OF STMT
+PARSE #2263355541784:c=0,e=255,p=0,cr=0,cu=0,mis=1,r=0,dep=1,og=1,plh=0,tim=307947141371
+=====================
+PARSING IN CURSOR #2263353970064 len=41 dep=1 uid=0 oct=3 lid=0 tim=307947141851 hv=387538332 ad='7ff769b447b0' sqlid='15knr3nbjkrcw'
+SELECT ORA_PLAN_ID_SEQ$.NEXTVAL FROM DUAL
+END OF STMT
+PARSE #2263353970064:c=0,e=430,p=0,cr=0,cu=0,mis=1,r=0,dep=1,og=4,plh=2501920895,tim=307947141851
+EXEC #2263353970064:c=0,e=12,p=0,cr=0,cu=0,mis=0,r=0,dep=1,og=4,plh=2501920895,tim=307947141914
+FETCH #2263353970064:c=0,e=9,p=0,cr=0,cu=0,mis=0,r=1,dep=1,og=4,plh=2501920895,tim=307947141936
+STAT #2263353970064 id=1 cnt=1 pid=0 pos=1 obj=7847 op='SEQUENCE  ORA_PLAN_ID_SEQ$ (cr=0 pr=0 pw=0 str=1 time=13 us)'
+STAT #2263353970064 id=2 cnt=1 pid=1 pos=1 obj=0 op='FAST DUAL  (cr=0 pr=0 pw=0 str=1 time=0 us cost=2 size=0 card=1)'
+CLOSE #2263353970064:c=0,e=1,dep=1,type=0,tim=307947142002
+EXEC #2263355541784:c=0,e=461,p=0,cr=1,cu=1,mis=1,r=1,dep=1,og=1,plh=0,tim=307947142508
+STAT #2263355541784 id=1 cnt=0 pid=0 pos=1 obj=7848 op='LOAD TABLE CONVENTIONAL  PLAN_TABLE (cr=1 pr=0 pw=0 str=1 time=46 us)'
+EXEC #2263355541784:c=0,e=448,p=0,cr=1,cu=1,mis=1,r=1,dep=1,og=1,plh=0,tim=307947143130
+CLOSE #2263355541784:c=0,e=2,dep=1,type=0,tim=307947143161
+EXEC #2263330417016:c=0,e=2069,p=0,cr=2,cu=2,mis=0,r=0,dep=0,og=1,plh=4030948918,tim=307947143173
+CLOSE #2263330417016:c=0,e=2,dep=0,type=0,tim=307947143324
+=====================
+PARSING IN CURSOR #2263330417016 len=74 dep=0 uid=109 oct=3 lid=109 tim=307947143438 hv=920998108 ad='7ff76a9e7980' sqlid='3s1hh8cvfan6w'
+SELECT PLAN_TABLE_OUTPUT FROM TABLE(DBMS_XPLAN.DISPLAY('PLAN_TABLE', :1))
+END OF STMT
+PARSE #2263330417016:c=0,e=90,p=0,cr=0,cu=0,mis=1,r=0,dep=0,og=1,plh=0,tim=307947143438
+=====================
+PARSING IN CURSOR #2263354013208 len=309 dep=1 uid=0 oct=3 lid=0 tim=307947145307 hv=4216473919 ad='7ff787d2ac70' sqlid='2syvqzbxp4k9z'
+select u.name, o.name, a.interface_version#, o.obj#      from association$ a, user$ u, obj$ o                     where a.obj# = :1                                          and a.property = :2                                      and a.statstype# = o.obj#                                and u.user# = o.owner#
+END OF STMT
+PARSE #2263354013208:c=0,e=259,p=0,cr=0,cu=0,mis=1,r=0,dep=1,og=4,plh=0,tim=307947145306
+EXEC #2263354013208:c=0,e=2050,p=0,cr=0,cu=0,mis=1,r=0,dep=1,og=4,plh=3866663607,tim=307947147460
+FETCH #2263354013208:c=0,e=23,p=0,cr=1,cu=0,mis=0,r=0,dep=1,og=4,plh=3866663607,tim=307947147513
+STAT #2263354013208 id=1 cnt=0 pid=0 pos=1 obj=0 op='HASH JOIN  (cr=1 pr=0 pw=0 str=1 time=32 us cost=2 size=113 card=1)'
+STAT #2263354013208 id=2 cnt=0 pid=1 pos=1 obj=0 op='NESTED LOOPS  (cr=1 pr=0 pw=0 str=1 time=26 us cost=2 size=113 card=1)'
+STAT #2263354013208 id=3 cnt=0 pid=2 pos=1 obj=0 op='STATISTICS COLLECTOR  (cr=1 pr=0 pw=0 str=1 time=26 us)'
+STAT #2263354013208 id=4 cnt=0 pid=3 pos=1 obj=0 op='HASH JOIN  (cr=1 pr=0 pw=0 str=1 time=21 us cost=1 size=95 card=1)'
+STAT #2263354013208 id=5 cnt=0 pid=4 pos=1 obj=0 op='NESTED LOOPS  (cr=1 pr=0 pw=0 str=1 time=19 us cost=1 size=95 card=1)'
+STAT #2263354013208 id=6 cnt=0 pid=5 pos=1 obj=0 op='STATISTICS COLLECTOR  (cr=1 pr=0 pw=0 str=1 time=18 us)'
+STAT #2263354013208 id=7 cnt=0 pid=6 pos=1 obj=671 op='TABLE ACCESS BY INDEX ROWID BATCHED ASSOCIATION$ (cr=1 pr=0 pw=0 str=1 time=9 us cost=0 size=52 card=1)'
+STAT #2263354013208 id=8 cnt=0 pid=7 pos=1 obj=672 op='INDEX RANGE SCAN ASSOC1 (cr=1 pr=0 pw=0 str=1 time=6 us cost=0 size=0 card=1)'
+STAT #2263354013208 id=9 cnt=0 pid=5 pos=2 obj=18 op='TABLE ACCESS BY INDEX ROWID BATCHED OBJ$ (cr=0 pr=0 pw=0 str=0 time=0 us cost=1 size=43 card=1)'
+STAT #2263354013208 id=10 cnt=0 pid=9 pos=1 obj=36 op='INDEX RANGE SCAN I_OBJ1 (cr=0 pr=0 pw=0 str=0 time=0 us cost=1 size=0 card=1)'
+STAT #2263354013208 id=11 cnt=0 pid=4 pos=2 obj=18 op='TABLE ACCESS FULL OBJ$ (cr=0 pr=0 pw=0 str=0 time=0 us cost=1 size=43 card=1)'
+STAT #2263354013208 id=12 cnt=0 pid=2 pos=2 obj=22 op='TABLE ACCESS CLUSTER USER$ (cr=0 pr=0 pw=0 str=0 time=0 us cost=1 size=18 card=1)'
+STAT #2263354013208 id=13 cnt=0 pid=12 pos=1 obj=11 op='INDEX UNIQUE SCAN I_USER# (cr=0 pr=0 pw=0 str=0 time=0 us cost=0 size=0 card=1)'
+STAT #2263354013208 id=14 cnt=0 pid=1 pos=2 obj=22 op='TABLE ACCESS FULL USER$ (cr=0 pr=0 pw=0 str=0 time=0 us cost=1 size=18 card=1)'
+CLOSE #2263354013208:c=0,e=3,dep=1,type=0,tim=307947147880
+=====================
+PARSING IN CURSOR #2263354013208 len=309 dep=1 uid=0 oct=3 lid=0 tim=307947147919 hv=4216473919 ad='7ff787d2ac70' sqlid='2syvqzbxp4k9z'
+select u.name, o.name, a.interface_version#, o.obj#      from association$ a, user$ u, obj$ o                     where a.obj# = :1                                          and a.property = :2                                      and a.statstype# = o.obj#                                and u.user# = o.owner#
+END OF STMT
+PARSE #2263354013208:c=0,e=13,p=0,cr=0,cu=0,mis=0,r=0,dep=1,og=4,plh=3866663607,tim=307947147919
+EXEC #2263354013208:c=0,e=19,p=0,cr=0,cu=0,mis=0,r=0,dep=1,og=4,plh=3866663607,tim=307947147985
+FETCH #2263354013208:c=0,e=4,p=0,cr=1,cu=0,mis=0,r=0,dep=1,og=4,plh=3866663607,tim=307947148002
+STAT #2263354013208 id=1 cnt=0 pid=0 pos=1 obj=0 op='HASH JOIN  (cr=1 pr=0 pw=0 str=1 time=8 us cost=2 size=113 card=1)'
+STAT #2263354013208 id=2 cnt=0 pid=1 pos=1 obj=0 op='NESTED LOOPS  (cr=1 pr=0 pw=0 str=1 time=7 us cost=2 size=113 card=1)'
+STAT #2263354013208 id=3 cnt=0 pid=2 pos=1 obj=0 op='STATISTICS COLLECTOR  (cr=1 pr=0 pw=0 str=1 time=5 us)'
+STAT #2263354013208 id=4 cnt=0 pid=3 pos=1 obj=0 op='HASH JOIN  (cr=1 pr=0 pw=0 str=1 time=5 us cost=1 size=95 card=1)'
+STAT #2263354013208 id=5 cnt=0 pid=4 pos=1 obj=0 op='NESTED LOOPS  (cr=1 pr=0 pw=0 str=1 time=5 us cost=1 size=95 card=1)'
+STAT #2263354013208 id=6 cnt=0 pid=5 pos=1 obj=0 op='STATISTICS COLLECTOR  (cr=1 pr=0 pw=0 str=1 time=4 us)'
+STAT #2263354013208 id=7 cnt=0 pid=6 pos=1 obj=671 op='TABLE ACCESS BY INDEX ROWID BATCHED ASSOCIATION$ (cr=1 pr=0 pw=0 str=1 time=3 us cost=0 size=52 card=1)'
+STAT #2263354013208 id=8 cnt=0 pid=7 pos=1 obj=672 op='INDEX RANGE SCAN ASSOC1 (cr=1 pr=0 pw=0 str=1 time=3 us cost=0 size=0 card=1)'
+STAT #2263354013208 id=9 cnt=0 pid=5 pos=2 obj=18 op='TABLE ACCESS BY INDEX ROWID BATCHED OBJ$ (cr=0 pr=0 pw=0 str=0 time=0 us cost=1 size=43 card=1)'
+STAT #2263354013208 id=10 cnt=0 pid=9 pos=1 obj=36 op='INDEX RANGE SCAN I_OBJ1 (cr=0 pr=0 pw=0 str=0 time=0 us cost=1 size=0 card=1)'
+STAT #2263354013208 id=11 cnt=0 pid=4 pos=2 obj=18 op='TABLE ACCESS FULL OBJ$ (cr=0 pr=0 pw=0 str=0 time=0 us cost=1 size=43 card=1)'
+STAT #2263354013208 id=12 cnt=0 pid=2 pos=2 obj=22 op='TABLE ACCESS CLUSTER USER$ (cr=0 pr=0 pw=0 str=0 time=0 us cost=1 size=18 card=1)'
+STAT #2263354013208 id=13 cnt=0 pid=12 pos=1 obj=11 op='INDEX UNIQUE SCAN I_USER# (cr=0 pr=0 pw=0 str=0 time=0 us cost=0 size=0 card=1)'
+STAT #2263354013208 id=14 cnt=0 pid=1 pos=2 obj=22 op='TABLE ACCESS FULL USER$ (cr=0 pr=0 pw=0 str=0 time=0 us cost=1 size=18 card=1)'
+CLOSE #2263354013208:c=0,e=2,dep=1,type=0,tim=307947148356
+EXEC #2263330417016:c=0,e=5145,p=0,cr=98,cu=0,mis=1,r=0,dep=0,og=1,plh=2137789089,tim=307947148625
+
+*** 2022-01-25T04:34:26.018594+01:00 (CDB$ROOT(1))
+=====================
+PARSING IN CURSOR #2263354771344 len=56 dep=2 uid=0 oct=3 lid=0 tim=307947150619 hv=2014842215 ad='7ff797bea738' sqlid='6vc4tzxw1h3b7'
+select 1 from sensitive_fixed$ where name=:1 and flag=:2
+END OF STMT
+PARSE #2263354771344:c=10518,e=224,p=0,cr=0,cu=0,mis=1,r=0,dep=2,og=4,plh=0,tim=307947150619
+EXEC #2263354771344:c=476,e=475,p=0,cr=0,cu=0,mis=1,r=0,dep=2,og=4,plh=1980766312,tim=307947151157
+FETCH #2263354771344:c=4,e=4,p=0,cr=1,cu=0,mis=0,r=0,dep=2,og=4,plh=1980766312,tim=307947151183
+STAT #2263354771344 id=1 cnt=0 pid=0 pos=1 obj=250 op='INDEX RANGE SCAN I_SENSITIVE_FIXED$ (cr=1 pr=0 pw=0 str=1 time=5 us cost=1 size=79 card=1)'
+CLOSE #2263354771344:c=1,e=2,dep=2,type=0,tim=307947151233
+=====================
+PARSING IN CURSOR #2263354771344 len=56 dep=2 uid=0 oct=3 lid=0 tim=307947151274 hv=2014842215 ad='7ff797bea738' sqlid='6vc4tzxw1h3b7'
+select 1 from sensitive_fixed$ where name=:1 and flag=:2
+END OF STMT
+PARSE #2263354771344:c=9,e=9,p=0,cr=0,cu=0,mis=0,r=0,dep=2,og=4,plh=1980766312,tim=307947151273
+EXEC #2263354771344:c=9,e=9,p=0,cr=0,cu=0,mis=0,r=0,dep=2,og=4,plh=1980766312,tim=307947151322
+FETCH #2263354771344:c=2,e=2,p=0,cr=1,cu=0,mis=0,r=0,dep=2,og=4,plh=1980766312,tim=307947151336
+STAT #2263354771344 id=1 cnt=0 pid=0 pos=1 obj=250 op='INDEX RANGE SCAN I_SENSITIVE_FIXED$ (cr=1 pr=0 pw=0 str=1 time=3 us cost=1 size=79 card=1)'
+CLOSE #2263354771344:c=1,e=1,dep=2,type=0,tim=307947151380
+
+*** 2022-01-25T04:34:26.019591+01:00 (PDBMBDS(3))
+=====================
+PARSING IN CURSOR #2263330395864 len=97 dep=2 uid=0 oct=3 lid=0 tim=307947151588 hv=791757000 ad='7ff78b6ff608' sqlid='87gaftwrm2h68'
+select o.owner#,o.name,o.namespace,o.remoteowner,o.linkname,o.subname from obj$ o where o.obj#=:1
+END OF STMT
+EXEC #2263330395864:c=12,e=11,p=0,cr=0,cu=0,mis=0,r=0,dep=2,og=4,plh=1072382624,tim=307947151587
+FETCH #2263330395864:c=8,e=8,p=0,cr=2,cu=0,mis=0,r=0,dep=2,og=4,plh=1072382624,tim=307947151645
+CLOSE #2263330395864:c=1,e=1,dep=2,type=3,tim=307947151660
+EXEC #2263330395864:c=7,e=7,p=0,cr=0,cu=0,mis=0,r=0,dep=2,og=4,plh=1072382624,tim=307947151683
+FETCH #2263330395864:c=2,e=2,p=0,cr=2,cu=0,mis=0,r=0,dep=2,og=4,plh=1072382624,tim=307947151695
+CLOSE #2263330395864:c=0,e=0,dep=2,type=3,tim=307947151706
+EXEC #2263330395864:c=5,e=6,p=0,cr=0,cu=0,mis=0,r=0,dep=2,og=4,plh=1072382624,tim=307947151725
+FETCH #2263330395864:c=2,e=2,p=0,cr=2,cu=0,mis=0,r=0,dep=2,og=4,plh=1072382624,tim=307947151736
+CLOSE #2263330395864:c=0,e=0,dep=2,type=3,tim=307947151747
+EXEC #2263330395864:c=5,e=5,p=0,cr=0,cu=0,mis=0,r=0,dep=2,og=4,plh=1072382624,tim=307947151765
+FETCH #2263330395864:c=2,e=2,p=0,cr=2,cu=0,mis=0,r=0,dep=2,og=4,plh=1072382624,tim=307947151777
+CLOSE #2263330395864:c=0,e=0,dep=2,type=3,tim=307947151787
+EXEC #2263330395864:c=5,e=5,p=0,cr=0,cu=0,mis=0,r=0,dep=2,og=4,plh=1072382624,tim=307947151807
+FETCH #2263330395864:c=2,e=2,p=0,cr=2,cu=0,mis=0,r=0,dep=2,og=4,plh=1072382624,tim=307947151818
+CLOSE #2263330395864:c=0,e=0,dep=2,type=3,tim=307947151829
+=====================
+PARSING IN CURSOR #2263344735600 len=90 dep=1 uid=0 oct=3 lid=0 tim=307947151887 hv=3522773882 ad='7ff7673e2c68' sqlid='f7b069b8zkhvu'
+SELECT to_number(value)
+         FROM sys.v$parameter
+         WHERE name = '_qa_lrg_type'
+END OF STMT
+PARSE #2263344735600:c=11786,e=3141,p=0,cr=12,cu=0,mis=1,r=0,dep=1,og=1,plh=4250213283,tim=307947151887
+EXEC #2263344735600:c=11,e=11,p=0,cr=0,cu=0,mis=0,r=0,dep=1,og=1,plh=4250213283,tim=307947151981
+FETCH #2263344735600:c=2464,e=2464,p=0,cr=0,cu=0,mis=0,r=0,dep=1,og=1,plh=4250213283,tim=307947154494
+STAT #2263344735600 id=1 cnt=0 pid=0 pos=1 obj=0 op='HASH JOIN  (cr=0 pr=0 pw=0 str=1 time=2466 us cost=1 size=58 card=1)'
+STAT #2263344735600 id=2 cnt=1 pid=1 pos=1 obj=0 op='FIXED TABLE FIXED INDEX X$KSPPI (ind:1) (cr=0 pr=0 pw=0 str=1 time=75 us cost=0 size=38 card=1)'
+STAT #2263344735600 id=3 cnt=5982 pid=1 pos=2 obj=0 op='FIXED TABLE FULL X$KSPPCV (cr=0 pr=0 pw=0 str=1 time=2084 us cost=1 size=119640 card=5982)'
+CLOSE #2263344735600:c=0,e=0,dep=1,type=3,tim=307947154918
+=====================
+PARSING IN CURSOR #2263345386520 len=432 dep=2 uid=109 oct=3 lid=109 tim=307947155546 hv=2372265884 ad='7ff78b7e9ce0' sqlid='f7fcpcu6qbtww'
+SELECT /* OPT_DYN_SAMP */ /*+ ALL_ROWS IGNORE_WHERE_CLAUSE RESULT_CACHE(SNAPSHOT=3600) opt_param('parallel_execution_enabled', 'false') NO_PARALLEL(SAMPLESUB) NO_PARALLEL_INDEX(SAMPLESUB) NO_SQL_TUNE */ NVL(SUM(C1),:"SYS_B_0"), NVL(SUM(C2),:"SYS_B_1") FROM (SELECT /*+ NO_PARALLEL("PLAN_TABLE") FULL("PLAN_TABLE") NO_PARALLEL_INDEX("PLAN_TABLE") */ :"SYS_B_2" AS C1, :"SYS_B_3" AS C2 FROM "SYS"."PLAN_TABLE$" "PLAN_TABLE") SAMPLESUB
+END OF STMT
+PARSE #2263345386520:c=145,e=145,p=0,cr=0,cu=0,mis=1,r=0,dep=2,og=1,plh=0,tim=307947155546
+EXEC #2263345386520:c=507,e=506,p=0,cr=0,cu=0,mis=1,r=0,dep=2,og=1,plh=1751138260,tim=307947156093
+FETCH #2263345386520:c=33,e=33,p=0,cr=3,cu=0,mis=0,r=1,dep=2,og=1,plh=1751138260,tim=307947156143
+STAT #2263345386520 id=1 cnt=1 pid=0 pos=1 obj=0 op='SORT AGGREGATE (cr=3 pr=0 pw=0 str=1 time=38 us)'
+STAT #2263345386520 id=2 cnt=2 pid=1 pos=1 obj=7848 op='TABLE ACCESS FULL PLAN_TABLE$ (cr=3 pr=0 pw=0 str=1 time=22 us cost=29 size=0 card=8168)'
+CLOSE #2263345386520:c=3,e=3,dep=2,type=0,tim=307947156214
+=====================
+PARSING IN CURSOR #2263354771344 len=146 dep=1 uid=109 oct=3 lid=109 tim=307947156633 hv=1143412014 ad='7ff7676c2768' sqlid='13fz57d22f59f'
+select /*+ opt_param('parallel_execution_enabled',
+                                   'false') EXEC_FROM_DBMS_XPLAN */ * from PLAN_TABLE where 1=0
+END OF STMT
+PARSE #2263354771344:c=1594,e=1594,p=0,cr=4,cu=0,mis=1,r=0,dep=1,og=1,plh=1067809428,tim=307947156633
+EXEC #2263354771344:c=10,e=10,p=0,cr=0,cu=0,mis=0,r=0,dep=1,og=1,plh=1067809428,tim=307947156695
+STAT #2263354771344 id=1 cnt=0 pid=0 pos=1 obj=0 op='FILTER  (cr=0 pr=0 pw=0 str=1 time=1 us)'
+STAT #2263354771344 id=2 cnt=0 pid=1 pos=1 obj=7848 op='TABLE ACCESS FULL PLAN_TABLE$ (cr=0 pr=0 pw=0 str=0 time=0 us cost=2 size=22652 card=2)'
+CLOSE #2263354771344:c=54,e=54,dep=1,type=0,tim=307947156853
+=====================
+PARSING IN CURSOR #2263345386520 len=910 dep=1 uid=109 oct=3 lid=109 tim=307947157055 hv=1859174542 ad='7ff783827908' sqlid='8zvjs5drd1h4f'
+SELECT /*+ opt_param('parallel_execution_enabled','false') */
+                         /* EXEC_FROM_DBMS_XPLAN */ id, parent_id, partition_id, timestamp, optimizer, position, search_columns, depth, operation, options, object_name, object_owner, object_type, object_instance, cardinality, bytes, temp_space, cost, io_cost, cpu_cost, time, partition_start, partition_stop, object_node, other_tag, distribution, null projection, access_predicates, filter_predicates, other, qblock_name, object_alias, nvl(other_xml, remarks) other_xml, null sql_profile, null sql_plan_baseline, null, null, null, null, null, null, null,
+                            null, null, null, null, null,
+                            null, null, null, null from PLAN_TABLE where plan_id = (select max(plan_id)
+                                        from PLAN_TABLE where id=0  and statement_id = :stmt_id)
+                       order by id
+END OF STMT
+PARSE #2263345386520:c=170,e=170,p=0,cr=0,cu=0,mis=1,r=0,dep=1,og=1,plh=0,tim=307947157054
+=====================
+PARSING IN CURSOR #2263364663984 len=498 dep=2 uid=109 oct=3 lid=109 tim=307947158033 hv=3997924504 ad='7ff76aa09810' sqlid='39stt1vr4qz4s'
+SELECT /* OPT_DYN_SAMP */ /*+ ALL_ROWS IGNORE_WHERE_CLAUSE RESULT_CACHE(SNAPSHOT=3600) opt_param('parallel_execution_enabled', 'false') NO_PARALLEL(SAMPLESUB) NO_PARALLEL_INDEX(SAMPLESUB) NO_SQL_TUNE */ NVL(SUM(C1),0), NVL(SUM(C2),0) FROM (SELECT /*+ IGNORE_WHERE_CLAUSE NO_PARALLEL("PLAN_TABLE") FULL("PLAN_TABLE") NO_PARALLEL_INDEX("PLAN_TABLE") */ 1 AS C1, CASE WHEN "PLAN_TABLE"."ID"=0 AND "PLAN_TABLE"."STATEMENT_ID"=:B1 THEN 1 ELSE 0 END AS C2 FROM "SYS"."PLAN_TABLE$" "PLAN_TABLE") SAMPLESUB
+END OF STMT
+PARSE #2263364663984:c=465,e=465,p=0,cr=0,cu=0,mis=1,r=0,dep=2,og=1,plh=0,tim=307947158033
+EXEC #2263364663984:c=890,e=890,p=0,cr=0,cu=0,mis=1,r=0,dep=2,og=1,plh=1751138260,tim=307947158990
+FETCH #2263364663984:c=25,e=25,p=0,cr=3,cu=0,mis=0,r=1,dep=2,og=1,plh=1751138260,tim=307947159032
+STAT #2263364663984 id=1 cnt=1 pid=0 pos=1 obj=0 op='SORT AGGREGATE (cr=3 pr=0 pw=0 str=1 time=29 us)'
+STAT #2263364663984 id=2 cnt=2 pid=1 pos=1 obj=7848 op='TABLE ACCESS FULL PLAN_TABLE$ (cr=3 pr=0 pw=0 str=1 time=18 us cost=29 size=245040 card=8168)'
+CLOSE #2263364663984:c=2,e=2,dep=2,type=0,tim=307947159103
+=====================
+PARSING IN CURSOR #2263364663984 len=432 dep=2 uid=109 oct=3 lid=109 tim=307947159218 hv=2372265884 ad='7ff78b7e9ce0' sqlid='f7fcpcu6qbtww'
+SELECT /* OPT_DYN_SAMP */ /*+ ALL_ROWS IGNORE_WHERE_CLAUSE RESULT_CACHE(SNAPSHOT=3600) opt_param('parallel_execution_enabled', 'false') NO_PARALLEL(SAMPLESUB) NO_PARALLEL_INDEX(SAMPLESUB) NO_SQL_TUNE */ NVL(SUM(C1),:"SYS_B_0"), NVL(SUM(C2),:"SYS_B_1") FROM (SELECT /*+ NO_PARALLEL("PLAN_TABLE") FULL("PLAN_TABLE") NO_PARALLEL_INDEX("PLAN_TABLE") */ :"SYS_B_2" AS C1, :"SYS_B_3" AS C2 FROM "SYS"."PLAN_TABLE$" "PLAN_TABLE") SAMPLESUB
+END OF STMT
+PARSE #2263364663984:c=28,e=28,p=0,cr=0,cu=0,mis=0,r=0,dep=2,og=1,plh=1751138260,tim=307947159218
+EXEC #2263364663984:c=14,e=14,p=0,cr=0,cu=0,mis=0,r=0,dep=2,og=1,plh=1751138260,tim=307947159272
+FETCH #2263364663984:c=22,e=21,p=0,cr=3,cu=0,mis=0,r=1,dep=2,og=1,plh=1751138260,tim=307947159304
+STAT #2263364663984 id=1 cnt=1 pid=0 pos=1 obj=0 op='SORT AGGREGATE (cr=3 pr=0 pw=0 str=1 time=24 us)'
+STAT #2263364663984 id=2 cnt=2 pid=1 pos=1 obj=7848 op='TABLE ACCESS FULL PLAN_TABLE$ (cr=3 pr=0 pw=0 str=1 time=13 us cost=29 size=0 card=8168)'
+CLOSE #2263364663984:c=2,e=2,dep=2,type=0,tim=307947159372
+EXEC #2263345386520:c=2797,e=2796,p=0,cr=8,cu=0,mis=1,r=0,dep=1,og=1,plh=58185665,tim=307947159899
+=====================
+PARSING IN CURSOR #2263361651304 len=110 dep=1 uid=109 oct=3 lid=109 tim=307947160023 hv=4293044569 ad='7ff77e8ea6b0' sqlid='g3f3cw3zy5aat'
+SELECT PLAN_TABLE_OUTPUT FROM TABLE(CAST(DBMS_XPLAN.PREPARE_RECORDS(:B1 , :B2 ) AS SYS.DBMS_XPLAN_TYPE_TABLE))
+END OF STMT
+PARSE #2263361651304:c=86,e=86,p=0,cr=0,cu=0,mis=1,r=0,dep=1,og=1,plh=0,tim=307947160023
+=====================
+PARSING IN CURSOR #2263330566272 len=60 dep=2 uid=0 oct=3 lid=0 tim=307947161002 hv=205165368 ad='7ff76be18ac0' sqlid='5u7g54s63p4ts'
+select toid from type$ where package_obj#=:1 and typ_name=:2
+END OF STMT
+PARSE #2263330566272:c=0,e=190,p=0,cr=0,cu=0,mis=1,r=0,dep=2,og=4,plh=0,tim=307947161002
+EXEC #2263330566272:c=0,e=487,p=0,cr=0,cu=0,mis=1,r=0,dep=2,og=4,plh=1946477951,tim=307947161540
+FETCH #2263330566272:c=0,e=8,p=0,cr=2,cu=0,mis=0,r=1,dep=2,og=4,plh=1946477951,tim=307947161569
+STAT #2263330566272 id=1 cnt=1 pid=0 pos=1 obj=767 op='INDEX RANGE SCAN I_TYPE6 (cr=2 pr=0 pw=0 str=1 time=8 us cost=2 size=23 card=1)'
+CLOSE #2263330566272:c=0,e=35,dep=2,type=0,tim=307947161617
+=====================
+PARSING IN CURSOR #2263330566272 len=60 dep=2 uid=0 oct=3 lid=0 tim=307947162357 hv=205165368 ad='7ff76be18ac0' sqlid='5u7g54s63p4ts'
+select toid from type$ where package_obj#=:1 and typ_name=:2
+END OF STMT
+PARSE #2263330566272:c=0,e=11,p=0,cr=0,cu=0,mis=0,r=0,dep=2,og=4,plh=1946477951,tim=307947162357
+EXEC #2263330566272:c=0,e=31,p=0,cr=0,cu=0,mis=0,r=0,dep=2,og=4,plh=1946477951,tim=307947162483
+FETCH #2263330566272:c=0,e=5,p=0,cr=2,cu=0,mis=0,r=1,dep=2,og=4,plh=1946477951,tim=307947162502
+STAT #2263330566272 id=1 cnt=1 pid=0 pos=1 obj=767 op='INDEX RANGE SCAN I_TYPE6 (cr=2 pr=0 pw=0 str=1 time=5 us cost=2 size=23 card=1)'
+CLOSE #2263330566272:c=0,e=51,dep=2,type=0,tim=307947162565
+=====================
+PARSING IN CURSOR #2263330566272 len=309 dep=2 uid=0 oct=3 lid=0 tim=307947163026 hv=4216473919 ad='7ff787d2ac70' sqlid='2syvqzbxp4k9z'
+select u.name, o.name, a.interface_version#, o.obj#      from association$ a, user$ u, obj$ o                     where a.obj# = :1                                          and a.property = :2                                      and a.statstype# = o.obj#                                and u.user# = o.owner#
+END OF STMT
+PARSE #2263330566272:c=0,e=303,p=0,cr=0,cu=0,mis=1,r=0,dep=2,og=4,plh=0,tim=307947163026
+EXEC #2263330566272:c=0,e=1768,p=0,cr=0,cu=0,mis=1,r=0,dep=2,og=4,plh=3866663607,tim=307947164885
+FETCH #2263330566272:c=0,e=19,p=0,cr=1,cu=0,mis=0,r=0,dep=2,og=4,plh=3866663607,tim=307947164926
+STAT #2263330566272 id=1 cnt=0 pid=0 pos=1 obj=0 op='HASH JOIN  (cr=1 pr=0 pw=0 str=1 time=26 us cost=2 size=113 card=1)'
+STAT #2263330566272 id=2 cnt=0 pid=1 pos=1 obj=0 op='NESTED LOOPS  (cr=1 pr=0 pw=0 str=1 time=22 us cost=2 size=113 card=1)'
+STAT #2263330566272 id=3 cnt=0 pid=2 pos=1 obj=0 op='STATISTICS COLLECTOR  (cr=1 pr=0 pw=0 str=1 time=21 us)'
+STAT #2263330566272 id=4 cnt=0 pid=3 pos=1 obj=0 op='HASH JOIN  (cr=1 pr=0 pw=0 str=1 time=16 us cost=1 size=95 card=1)'
+STAT #2263330566272 id=5 cnt=0 pid=4 pos=1 obj=0 op='NESTED LOOPS  (cr=1 pr=0 pw=0 str=1 time=14 us cost=1 size=95 card=1)'
+STAT #2263330566272 id=6 cnt=0 pid=5 pos=1 obj=0 op='STATISTICS COLLECTOR  (cr=1 pr=0 pw=0 str=1 time=13 us)'
+STAT #2263330566272 id=7 cnt=0 pid=6 pos=1 obj=671 op='TABLE ACCESS BY INDEX ROWID BATCHED ASSOCIATION$ (cr=1 pr=0 pw=0 str=1 time=4 us cost=0 size=52 card=1)'
+STAT #2263330566272 id=8 cnt=0 pid=7 pos=1 obj=672 op='INDEX RANGE SCAN ASSOC1 (cr=1 pr=0 pw=0 str=1 time=3 us cost=0 size=0 card=1)'
+STAT #2263330566272 id=9 cnt=0 pid=5 pos=2 obj=18 op='TABLE ACCESS BY INDEX ROWID BATCHED OBJ$ (cr=0 pr=0 pw=0 str=0 time=0 us cost=1 size=43 card=1)'
+STAT #2263330566272 id=10 cnt=0 pid=9 pos=1 obj=36 op='INDEX RANGE SCAN I_OBJ1 (cr=0 pr=0 pw=0 str=0 time=0 us cost=1 size=0 card=1)'
+STAT #2263330566272 id=11 cnt=0 pid=4 pos=2 obj=18 op='TABLE ACCESS FULL OBJ$ (cr=0 pr=0 pw=0 str=0 time=0 us cost=1 size=43 card=1)'
+STAT #2263330566272 id=12 cnt=0 pid=2 pos=2 obj=22 op='TABLE ACCESS CLUSTER USER$ (cr=0 pr=0 pw=0 str=0 time=0 us cost=1 size=18 card=1)'
+STAT #2263330566272 id=13 cnt=0 pid=12 pos=1 obj=11 op='INDEX UNIQUE SCAN I_USER# (cr=0 pr=0 pw=0 str=0 time=0 us cost=0 size=0 card=1)'
+STAT #2263330566272 id=14 cnt=0 pid=1 pos=2 obj=22 op='TABLE ACCESS FULL USER$ (cr=0 pr=0 pw=0 str=0 time=0 us cost=1 size=18 card=1)'
+CLOSE #2263330566272:c=0,e=3,dep=2,type=0,tim=307947165292
+=====================
+PARSING IN CURSOR #2263330566272 len=309 dep=2 uid=0 oct=3 lid=0 tim=307947165324 hv=4216473919 ad='7ff787d2ac70' sqlid='2syvqzbxp4k9z'
+select u.name, o.name, a.interface_version#, o.obj#      from association$ a, user$ u, obj$ o                     where a.obj# = :1                                          and a.property = :2                                      and a.statstype# = o.obj#                                and u.user# = o.owner#
+END OF STMT
+PARSE #2263330566272:c=0,e=11,p=0,cr=0,cu=0,mis=0,r=0,dep=2,og=4,plh=3866663607,tim=307947165324
+EXEC #2263330566272:c=0,e=16,p=0,cr=0,cu=0,mis=0,r=0,dep=2,og=4,plh=3866663607,tim=307947165384
+FETCH #2263330566272:c=0,e=4,p=0,cr=1,cu=0,mis=0,r=0,dep=2,og=4,plh=3866663607,tim=307947165400
+STAT #2263330566272 id=1 cnt=0 pid=0 pos=1 obj=0 op='HASH JOIN  (cr=1 pr=0 pw=0 str=1 time=6 us cost=2 size=113 card=1)'
+STAT #2263330566272 id=2 cnt=0 pid=1 pos=1 obj=0 op='NESTED LOOPS  (cr=1 pr=0 pw=0 str=1 time=6 us cost=2 size=113 card=1)'
+STAT #2263330566272 id=3 cnt=0 pid=2 pos=1 obj=0 op='STATISTICS COLLECTOR  (cr=1 pr=0 pw=0 str=1 time=6 us)'
+STAT #2263330566272 id=4 cnt=0 pid=3 pos=1 obj=0 op='HASH JOIN  (cr=1 pr=0 pw=0 str=1 time=4 us cost=1 size=95 card=1)'
+STAT #2263330566272 id=5 cnt=0 pid=4 pos=1 obj=0 op='NESTED LOOPS  (cr=1 pr=0 pw=0 str=1 time=4 us cost=1 size=95 card=1)'
+STAT #2263330566272 id=6 cnt=0 pid=5 pos=1 obj=0 op='STATISTICS COLLECTOR  (cr=1 pr=0 pw=0 str=1 time=4 us)'
+STAT #2263330566272 id=7 cnt=0 pid=6 pos=1 obj=671 op='TABLE ACCESS BY INDEX ROWID BATCHED ASSOCIATION$ (cr=1 pr=0 pw=0 str=1 time=4 us cost=0 size=52 card=1)'
+STAT #2263330566272 id=8 cnt=0 pid=7 pos=1 obj=672 op='INDEX RANGE SCAN ASSOC1 (cr=1 pr=0 pw=0 str=1 time=3 us cost=0 size=0 card=1)'
+STAT #2263330566272 id=9 cnt=0 pid=5 pos=2 obj=18 op='TABLE ACCESS BY INDEX ROWID BATCHED OBJ$ (cr=0 pr=0 pw=0 str=0 time=0 us cost=1 size=43 card=1)'
+STAT #2263330566272 id=10 cnt=0 pid=9 pos=1 obj=36 op='INDEX RANGE SCAN I_OBJ1 (cr=0 pr=0 pw=0 str=0 time=0 us cost=1 size=0 card=1)'
+STAT #2263330566272 id=11 cnt=0 pid=4 pos=2 obj=18 op='TABLE ACCESS FULL OBJ$ (cr=0 pr=0 pw=0 str=0 time=0 us cost=1 size=43 card=1)'
+STAT #2263330566272 id=12 cnt=0 pid=2 pos=2 obj=22 op='TABLE ACCESS CLUSTER USER$ (cr=0 pr=0 pw=0 str=0 time=0 us cost=1 size=18 card=1)'
+STAT #2263330566272 id=13 cnt=0 pid=12 pos=1 obj=11 op='INDEX UNIQUE SCAN I_USER# (cr=0 pr=0 pw=0 str=0 time=0 us cost=0 size=0 card=1)'
+STAT #2263330566272 id=14 cnt=0 pid=1 pos=2 obj=22 op='TABLE ACCESS FULL USER$ (cr=0 pr=0 pw=0 str=0 time=0 us cost=1 size=18 card=1)'
+CLOSE #2263330566272:c=0,e=2,dep=2,type=0,tim=307947165832
+EXEC #2263361651304:c=0,e=5987,p=0,cr=114,cu=0,mis=1,r=0,dep=1,og=1,plh=992138068,tim=307947166051
+EXEC #2263344735600:c=0,e=11,p=0,cr=0,cu=0,mis=0,r=0,dep=2,og=1,plh=4250213283,tim=307947166154
+FETCH #2263344735600:c=6179,e=2602,p=0,cr=0,cu=0,mis=0,r=0,dep=2,og=1,plh=4250213283,tim=307947168802
+CLOSE #2263344735600:c=0,e=0,dep=2,type=3,tim=307947168832
+FETCH #2263345386520:c=82,e=82,p=0,cr=6,cu=0,mis=0,r=1,dep=2,og=1,plh=58185665,tim=307947168943
+FETCH #2263345386520:c=6,e=6,p=0,cr=0,cu=0,mis=0,r=1,dep=2,og=1,plh=58185665,tim=307947168989
+EXEC #2263344735600:c=9,e=9,p=0,cr=0,cu=0,mis=0,r=0,dep=2,og=1,plh=4250213283,tim=307947169063
+FETCH #2263344735600:c=2436,e=2436,p=0,cr=0,cu=0,mis=0,r=0,dep=2,og=1,plh=4250213283,tim=307947171533
+CLOSE #2263344735600:c=0,e=0,dep=2,type=3,tim=307947171559
+=====================
+PARSING IN CURSOR #2263362874048 len=2018 dep=2 uid=109 oct=3 lid=109 tim=307947171856 hv=3591012467 ad='7ff742c9be60' sqlid='7u2as5mb0p03m'
+SELECT /*+ opt_param('parallel_execution_enabled', 'false') */ extractvalue(xmlval, '/*/info[@type = "sql_profile"]'), extractvalue(xmlval, '/*/info[@type = "sql_patch"]'), extractvalue(xmlval, '/*/info[@type = "baseline"]'), extractvalue(xmlval, '/*/info[@type = "outline"]'), extractvalue(xmlval, '/*/info[@type = "dynamic_sampling"]'), extractvalue(xmlval, '/*/info[@type = "dop"]'), extractvalue(xmlval, '/*/info[@type = "dop_reason"]'), extractvalue(xmlval, '/*/info[@type = "pdml_reason"]'), extractvalue(xmlval, '/*/info[@type = "idl_reason"]'), extractvalue(xmlval, '/*/info[@type = "queuing_reason"]'), extractvalue(xmlval, '/*/info[@type = "px_in_memory"]'), extractvalue(xmlval, '/*/info[@type = "px_in_memory_imc"]'), extractvalue(xmlval, '/*/info[@type = "row_shipping"]'), extractvalue(xmlval, '/*/info[@type = "index_size"]'), extractvalue(xmlval, '/*/info[@type = "result_checksum"]'), extractvalue(xmlval, '/*/info[@type = "cardinality_feedback"]'), extractvalue(xmlval, '/*/info[@type = "performance_feedback"]'), extractvalue(xmlval, '/*/info[@type = "rely_constraint"]'), extractvalue(xmlval, '/*/info[@type = "xml_suboptimal"]'), extractvalue(xmlval, '/*/info[@type = "adaptive_plan"]'), extractvalue(xmlval, '/*/spd/cu'), extractvalue(xmlval, '/*/info[@type = "gtt_session_st"]'), extractvalue(xmlval, 
+            '/*/info[@type = "gather_stats_on_conventional_dml"]'), extractvalue(xmlval, 
+            '/*/info[@type = "optimizer_use_stats_on_conventional_dml"]'), extractvalue(xmlval,
+            '/*/info[@type = "optimizer_use_stats_models"]'), extractvalue(xmlval, '/*/info[@type = "slave_parse"]'), extractvalue(xmlval, '/*/info[@type = "baseline_repro_fail"]'), extractvalue(xmlval,'/*/info[@type = "plan_hash"]'), extractvalue(xmlval, '/*/info[@type = "cross_shard_query"]'), extractvalue(xmlval, '/*/info[@type = "shard_id"]'), extract(xmlval, '/*/hint_usage').getClobVal(), extractvalue(xmlval, '/*/info[@type = "ads_system"]') from (select xmltype(:v_other_xml) xmlval from sys.dual)
+END OF STMT
+PARSE #2263362874048:c=269,e=269,p=0,cr=0,cu=0,mis=1,r=0,dep=2,og=1,plh=0,tim=307947171856
+EXEC #2263362874048:c=12480,e=18652,p=0,cr=594,cu=0,mis=1,r=0,dep=2,og=1,plh=1388734953,tim=307947190599
+FETCH #2263362874048:c=3517,e=3517,p=0,cr=0,cu=0,mis=0,r=1,dep=2,og=1,plh=1388734953,tim=307947194163
+STAT #2263362874048 id=1 cnt=1 pid=0 pos=1 obj=0 op='FAST DUAL  (cr=0 pr=0 pw=0 str=1 time=0 us cost=2 size=0 card=1)'
+CLOSE #2263362874048:c=1,e=1,dep=2,type=3,tim=307947194239
+=====================
+PARSING IN CURSOR #2263350710288 len=167 dep=2 uid=109 oct=3 lid=109 tim=307947194395 hv=3079978998 ad='7ff783d3b800' sqlid='gghk7k6vt9gzq'
+SELECT /*+ opt_param('parallel_execution_enabled', 'false') */ extract(xmlval, '/*/outline_data').getClobVal() from (select xmltype(:v_other_xml) xmlval from sys.dual)
+END OF STMT
+PARSE #2263350710288:c=126,e=126,p=0,cr=0,cu=0,mis=1,r=0,dep=2,og=1,plh=0,tim=307947194395
+EXEC #2263350710288:c=1591,e=1591,p=0,cr=36,cu=0,mis=1,r=0,dep=2,og=1,plh=1388734953,tim=307947196029
+FETCH #2263350710288:c=423,e=423,p=0,cr=0,cu=0,mis=0,r=1,dep=2,og=1,plh=1388734953,tim=307947196474
+STAT #2263350710288 id=1 cnt=1 pid=0 pos=1 obj=0 op='FAST DUAL  (cr=0 pr=0 pw=0 str=1 time=0 us cost=2 size=0 card=1)'
+CLOSE #2263350710288:c=0,e=0,dep=2,type=3,tim=307947196534
+=====================
+PARSING IN CURSOR #2263352097976 len=298 dep=2 uid=109 oct=3 lid=109 tim=307947196803 hv=580989905 ad='7ff75fcae460' sqlid='fg4skgcja2cyj'
+SELECT EXTRACTVALUE(VALUE(D), '/row/@op'), EXTRACTVALUE(VALUE(D), '/row/@dis'), EXTRACTVALUE(VALUE(D), '/row/@par'), EXTRACTVALUE(VALUE(D), '/row/@prt'), EXTRACTVALUE(VALUE(D), '/row/@dep'), EXTRACTVALUE(VALUE(D), '/row/@skp') FROM TABLE(XMLSEQUENCE(EXTRACT(XMLTYPE(:B1 ), '/*/display_map/row'))) D
+END OF STMT
+PARSE #2263352097976:c=115,e=115,p=0,cr=0,cu=0,mis=1,r=0,dep=2,og=1,plh=0,tim=307947196803
+=====================
+PARSING IN CURSOR #2263353974472 len=309 dep=3 uid=0 oct=3 lid=0 tim=307947199718 hv=4216473919 ad='7ff787d2ac70' sqlid='2syvqzbxp4k9z'
+select u.name, o.name, a.interface_version#, o.obj#      from association$ a, user$ u, obj$ o                     where a.obj# = :1                                          and a.property = :2                                      and a.statstype# = o.obj#                                and u.user# = o.owner#
+END OF STMT
+PARSE #2263353974472:c=13,e=13,p=0,cr=0,cu=0,mis=0,r=0,dep=3,og=4,plh=3866663607,tim=307947199718
+EXEC #2263353974472:c=28,e=28,p=0,cr=0,cu=0,mis=0,r=0,dep=3,og=4,plh=3866663607,tim=307947199801
+FETCH #2263353974472:c=7,e=7,p=0,cr=1,cu=0,mis=0,r=0,dep=3,og=4,plh=3866663607,tim=307947199821
+STAT #2263353974472 id=1 cnt=0 pid=0 pos=1 obj=0 op='HASH JOIN  (cr=1 pr=0 pw=0 str=1 time=13 us cost=2 size=113 card=1)'
+STAT #2263353974472 id=2 cnt=0 pid=1 pos=1 obj=0 op='NESTED LOOPS  (cr=1 pr=0 pw=0 str=1 time=12 us cost=2 size=113 card=1)'
+STAT #2263353974472 id=3 cnt=0 pid=2 pos=1 obj=0 op='STATISTICS COLLECTOR  (cr=1 pr=0 pw=0 str=1 time=9 us)'
+STAT #2263353974472 id=4 cnt=0 pid=3 pos=1 obj=0 op='HASH JOIN  (cr=1 pr=0 pw=0 str=1 time=8 us cost=1 size=95 card=1)'
+STAT #2263353974472 id=5 cnt=0 pid=4 pos=1 obj=0 op='NESTED LOOPS  (cr=1 pr=0 pw=0 str=1 time=8 us cost=1 size=95 card=1)'
+STAT #2263353974472 id=6 cnt=0 pid=5 pos=1 obj=0 op='STATISTICS COLLECTOR  (cr=1 pr=0 pw=0 str=1 time=7 us)'
+STAT #2263353974472 id=7 cnt=0 pid=6 pos=1 obj=671 op='TABLE ACCESS BY INDEX ROWID BATCHED ASSOCIATION$ (cr=1 pr=0 pw=0 str=1 time=6 us cost=0 size=52 card=1)'
+STAT #2263353974472 id=8 cnt=0 pid=7 pos=1 obj=672 op='INDEX RANGE SCAN ASSOC1 (cr=1 pr=0 pw=0 str=1 time=5 us cost=0 size=0 card=1)'
+STAT #2263353974472 id=9 cnt=0 pid=5 pos=2 obj=18 op='TABLE ACCESS BY INDEX ROWID BATCHED OBJ$ (cr=0 pr=0 pw=0 str=0 time=0 us cost=1 size=43 card=1)'
+STAT #2263353974472 id=10 cnt=0 pid=9 pos=1 obj=36 op='INDEX RANGE SCAN I_OBJ1 (cr=0 pr=0 pw=0 str=0 time=0 us cost=1 size=0 card=1)'
+STAT #2263353974472 id=11 cnt=0 pid=4 pos=2 obj=18 op='TABLE ACCESS FULL OBJ$ (cr=0 pr=0 pw=0 str=0 time=0 us cost=1 size=43 card=1)'
+STAT #2263353974472 id=12 cnt=0 pid=2 pos=2 obj=22 op='TABLE ACCESS CLUSTER USER$ (cr=0 pr=0 pw=0 str=0 time=0 us cost=1 size=18 card=1)'
+STAT #2263353974472 id=13 cnt=0 pid=12 pos=1 obj=11 op='INDEX UNIQUE SCAN I_USER# (cr=0 pr=0 pw=0 str=0 time=0 us cost=0 size=0 card=1)'
+STAT #2263353974472 id=14 cnt=0 pid=1 pos=2 obj=22 op='TABLE ACCESS FULL USER$ (cr=0 pr=0 pw=0 str=0 time=0 us cost=1 size=18 card=1)'
+CLOSE #2263353974472:c=8,e=8,dep=3,type=1,tim=307947200251
+PARSE #2263353974472:c=6,e=6,p=0,cr=0,cu=0,mis=0,r=0,dep=3,og=4,plh=3866663607,tim=307947200281
+EXEC #2263353974472:c=17,e=16,p=0,cr=0,cu=0,mis=0,r=0,dep=3,og=4,plh=3866663607,tim=307947200317
+FETCH #2263353974472:c=4,e=4,p=0,cr=1,cu=0,mis=0,r=0,dep=3,og=4,plh=3866663607,tim=307947200334
+CLOSE #2263353974472:c=1,e=2,dep=3,type=3,tim=307947200351
+EXEC #2263352097976:c=9378,e=4380,p=0,cr=128,cu=0,mis=1,r=0,dep=2,og=1,plh=1186311642,tim=307947201226
+FETCH #2263352097976:c=11,e=10,p=0,cr=0,cu=0,mis=0,r=0,dep=2,og=1,plh=1186311642,tim=307947201257
+STAT #2263352097976 id=1 cnt=0 pid=0 pos=1 obj=0 op='COLLECTION ITERATOR PICKLER FETCH XMLSEQUENCEFROMXMLTYPE (cr=0 pr=0 pw=0 str=1 time=376 us cost=29 size=16336 card=8168)'
+CLOSE #2263352097976:c=0,e=0,dep=2,type=3,tim=307947201321
+FETCH #2263345386520:c=7,e=7,p=0,cr=0,cu=0,mis=0,r=0,dep=2,og=1,plh=58185665,tim=307947201362
+STAT #2263345386520 id=1 cnt=2 pid=0 pos=1 obj=0 op='SORT ORDER BY (cr=6 pr=0 pw=0 str=1 time=70 us cost=5 size=9307 card=1)'
+STAT #2263345386520 id=2 cnt=2 pid=1 pos=1 obj=7848 op='TABLE ACCESS FULL PLAN_TABLE$ (cr=6 pr=0 pw=0 str=1 time=40 us cost=2 size=9307 card=1)'
+STAT #2263345386520 id=3 cnt=1 pid=2 pos=1 obj=0 op='SORT AGGREGATE (cr=3 pr=0 pw=0 str=1 time=18 us)'
+STAT #2263345386520 id=4 cnt=1 pid=3 pos=1 obj=7848 op='TABLE ACCESS FULL PLAN_TABLE$ (cr=3 pr=0 pw=0 str=1 time=13 us cost=2 size=43 card=1)'
+FETCH #2263361651304:c=37801,e=35527,p=0,cr=764,cu=0,mis=0,r=13,dep=1,og=1,plh=992138068,tim=307947201598
+STAT #2263361651304 id=1 cnt=13 pid=0 pos=1 obj=0 op='COLLECTION ITERATOR PICKLER FETCH PREPARE_RECORDS (cr=764 pr=0 pw=0 str=1 time=35468 us cost=29 size=16336 card=8168)'
+FETCH #2263330417016:c=57834,e=53011,p=0,cr=902,cu=0,mis=0,r=1,dep=0,og=1,plh=2137789089,tim=307947201668
+CLOSE #2263361651304:c=1,e=1,dep=1,type=3,tim=307947201910
+CLOSE #2263345386520:c=5,e=5,dep=1,type=0,tim=307947201941
+FETCH #2263330417016:c=69,e=69,p=0,cr=0,cu=0,mis=0,r=12,dep=0,og=1,plh=2137789089,tim=307947201960
+STAT #2263330417016 id=1 cnt=13 pid=0 pos=1 obj=0 op='COLLECTION ITERATOR PICKLER FETCH DISPLAY (cr=902 pr=0 pw=0 str=1 time=53006 us cost=29 size=16336 card=8168)'
+CLOSE #2263330417016:c=4,e=4,dep=0,type=0,tim=307947206107
+=====================
+PARSING IN CURSOR #2263330417016 len=45 dep=0 uid=109 oct=7 lid=109 tim=307947206166 hv=349105966 ad='7ff783f5d990' sqlid='g72kdvcacxvtf'
+DELETE FROM PLAN_TABLE WHERE STATEMENT_ID=:1
+END OF STMT
+PARSE #2263330417016:c=32,e=32,p=0,cr=0,cu=0,mis=0,r=0,dep=0,og=1,plh=2637181423,tim=307947206166
+EXEC #2263330417016:c=81,e=81,p=0,cr=3,cu=2,mis=0,r=2,dep=0,og=1,plh=2637181423,tim=307947206289
+STAT #2263330417016 id=1 cnt=0 pid=0 pos=1 obj=0 op='DELETE  PLAN_TABLE$ (cr=3 pr=0 pw=0 str=1 time=64 us)'
+STAT #2263330417016 id=2 cnt=2 pid=1 pos=1 obj=7848 op='TABLE ACCESS FULL PLAN_TABLE$ (cr=3 pr=0 pw=0 str=1 time=23 us cost=2 size=17 card=1)'
+*** SESSION ID:(984.26613) 2022-01-25T04:34:26.079539+01:00
+*** CONTAINER ID:(3) 2022-01-25T04:34:26.079539+01:00
+*** CLIENT IP:(127.0.0.1) 2022-01-25T04:34:26.079539+01:00
+ 
+CLOSE #2263330417016:c=0,e=2,dep=0,type=0,tim=307947211820
+=====================
+PARSING IN CURSOR #2263344672432 len=124 dep=1 uid=0 oct=3 lid=0 tim=307947213126 hv=4179850718 ad='7ff767ab7658' sqlid='10gywwmwk6xfy'
+select /* QOSD */ /*+ index(eh)*/ objn, sub_id, fixed_cost, text, col_list, flags, ctime from exp_head$ eh where exp_id = :1
+END OF STMT
+PARSE #2263344672432:c=0,e=195,p=0,cr=0,cu=0,mis=1,r=0,dep=1,og=4,plh=0,tim=307947213126
+EXEC #2263344672432:c=5787,e=505,p=0,cr=0,cu=0,mis=1,r=0,dep=1,og=4,plh=1426583507,tim=307947213687
+FETCH #2263344672432:c=6,e=6,p=0,cr=1,cu=0,mis=0,r=0,dep=1,og=4,plh=1426583507,tim=307947213711
+STAT #2263344672432 id=1 cnt=0 pid=0 pos=1 obj=739 op='TABLE ACCESS BY INDEX ROWID EXP_HEAD$ (cr=1 pr=0 pw=0 str=1 time=7 us cost=1 size=71 card=1)'
+STAT #2263344672432 id=2 cnt=0 pid=1 pos=1 obj=740 op='INDEX UNIQUE SCAN I_EXP_HEAD$ (cr=1 pr=0 pw=0 str=1 time=5 us cost=0 size=0 card=1)'
+CLOSE #2263344672432:c=1,e=1,dep=1,type=3,tim=307947213793
+=====================
+PARSING IN CURSOR #2263345336304 len=137 dep=1 uid=0 oct=2 lid=0 tim=307947213998 hv=309576400 ad='7ff76a970628' sqlid='dbvj6jc977hqh'
+insert /* QOSD */ into exp_head$ (exp_id, objn, sub_id, fixed_cost, text, col_list, flags, ctime) values (:1, :2, :3, :4, :5, :6, :7, :8)
+END OF STMT
+PARSE #2263345336304:c=168,e=168,p=0,cr=0,cu=0,mis=1,r=0,dep=1,og=4,plh=0,tim=307947213998
+EXEC #2263345336304:c=315,e=315,p=0,cr=0,cu=5,mis=1,r=1,dep=1,og=4,plh=0,tim=307947214362
+STAT #2263345336304 id=1 cnt=0 pid=0 pos=1 obj=739 op='LOAD TABLE CONVENTIONAL  EXP_HEAD$ (cr=0 pr=0 pw=0 str=1 time=61 us)'
+CLOSE #2263345336304:c=1,e=1,dep=1,type=3,tim=307947214448
+=====================
+PARSING IN CURSOR #2263330417016 len=101 dep=0 uid=109 oct=3 lid=109 tim=307947214720 hv=2867987160 ad='7ff76a982498' sqlid='07nbcdapg40qs'
+select dname, ename, sal
+from emp e, dept d
+where d.deptno=e.deptno
+and job in ('PRESIDENT', 'CLERK')
+END OF STMT
+PARSE #2263330417016:c=6820,e=2831,p=0,cr=1,cu=6,mis=1,r=0,dep=0,og=1,plh=3398621893,tim=307947214720
+EXEC #2263330417016:c=12,e=12,p=0,cr=0,cu=0,mis=0,r=0,dep=0,og=1,plh=3398621893,tim=307947214774
+FETCH #2263330417016:c=31,e=32,p=0,cr=5,cu=0,mis=0,r=1,dep=0,og=1,plh=3398621893,tim=307947214829
+FETCH #2263330417016:c=12,e=12,p=0,cr=2,cu=0,mis=0,r=4,dep=0,og=1,plh=3398621893,tim=307947215001
+STAT #2263330417016 id=1 cnt=5 pid=0 pos=1 obj=0 op='MERGE JOIN  (cr=7 pr=0 pw=0 str=1 time=30 us cost=5 size=204 card=6)'
+STAT #2263330417016 id=2 cnt=4 pid=1 pos=1 obj=77926 op='TABLE ACCESS BY INDEX ROWID DEPT (cr=4 pr=0 pw=0 str=1 time=23 us cost=2 size=52 card=4)'
+STAT #2263330417016 id=3 cnt=4 pid=2 pos=1 obj=77927 op='INDEX FULL SCAN PK_DEPT (cr=2 pr=0 pw=0 str=1 time=11 us cost=1 size=0 card=4)'
+STAT #2263330417016 id=4 cnt=5 pid=1 pos=2 obj=0 op='SORT JOIN (cr=3 pr=0 pw=0 str=4 time=21 us cost=3 size=126 card=6)'
+STAT #2263330417016 id=5 cnt=5 pid=4 pos=1 obj=0 op='INLIST ITERATOR  (cr=3 pr=0 pw=0 str=1 time=11 us)'
+STAT #2263330417016 id=6 cnt=5 pid=5 pos=1 obj=77924 op='TABLE ACCESS BY INDEX ROWID BATCHED EMP (cr=3 pr=0 pw=0 str=2 time=12 us cost=2 size=126 card=6)'
+STAT #2263330417016 id=7 cnt=5 pid=6 pos=1 obj=77934 op='INDEX RANGE SCAN IDX_EMP_JOB_SAL (cr=2 pr=0 pw=0 str=2 time=6 us cost=1 size=0 card=6)'
+*** SESSION ID:(984.26613) 2022-01-25T04:34:26.085301+01:00
+*** CONTAINER ID:(3) 2022-01-25T04:34:26.085301+01:00
+*** CLIENT IP:(127.0.0.1) 2022-01-25T04:34:26.085301+01:00
+ 
+CLOSE #2263330417016:c=3,e=3,dep=0,type=0,tim=307947217935
+=====================
+PARSING IN CURSOR #2263330417016 len=45 dep=0 uid=109 oct=7 lid=109 tim=307947218007 hv=349105966 ad='7ff783f5d990' sqlid='g72kdvcacxvtf'
+DELETE FROM PLAN_TABLE WHERE STATEMENT_ID=:1
+END OF STMT
+PARSE #2263330417016:c=12,e=12,p=0,cr=0,cu=0,mis=0,r=0,dep=0,og=1,plh=2637181423,tim=307947218007
+EXEC #2263330417016:c=35,e=35,p=0,cr=3,cu=0,mis=0,r=0,dep=0,og=1,plh=2637181423,tim=307947218079
+STAT #2263330417016 id=1 cnt=0 pid=0 pos=1 obj=0 op='DELETE  PLAN_TABLE$ (cr=3 pr=0 pw=0 str=1 time=21 us)'
+STAT #2263330417016 id=2 cnt=0 pid=1 pos=1 obj=7848 op='TABLE ACCESS FULL PLAN_TABLE$ (cr=3 pr=0 pw=0 str=1 time=20 us cost=2 size=17 card=1)'
+CLOSE #2263330417016:c=5,e=5,dep=0,type=1,tim=307947218845
+=====================
+PARSING IN CURSOR #2263352082672 len=148 dep=0 uid=109 oct=50 lid=109 tim=307947220073 hv=2626383254 ad='7ff783688258' sqlid='2hpz65kf8qvcq'
+EXPLAIN PLAN SET STATEMENT_ID='PLUS130410' FOR select dname, ename, sal
+from emp e, dept d
+where d.deptno=e.deptno
+and job in ('PRESIDENT', 'CLERK')
+END OF STMT
+PARSE #2263352082672:c=1208,e=1208,p=0,cr=0,cu=0,mis=1,r=0,dep=0,og=1,plh=3398621893,tim=307947220073
+=====================
+PARSING IN CURSOR #2263354016680 len=586 dep=1 uid=109 oct=2 lid=109 tim=307947220155 hv=2508123768 ad='7ff76a95aa58' sqlid='99qa3zyarxvms'
+insert into plan_table (statement_id, timestamp, operation, options,object_node, object_owner, object_name, object_instance, object_type,search_columns, id, parent_id, position, other,optimizer, cost, cardinality, bytes, other_tag, partition_start, partition_stop, partition_id, distribution, cpu_cost, io_cost, temp_space, access_predicates, filter_predicates, projection, time, qblock_name, object_alias, plan_id, depth, remarks, other_xml ) values(:1,:2,:3,:4,:5,:6,:7,:8,:9,:10,:11,:12,:13,:14,:15,:16,:17,:18,:19,:20,:21,:22,:23,:24,:25,:26,:27,:28,:29,:30,:31,:32,:33,:34,:35,:36)
+END OF STMT
+PARSE #2263354016680:c=26,e=26,p=0,cr=0,cu=0,mis=0,r=0,dep=1,og=1,plh=0,tim=307947220155
+=====================
+PARSING IN CURSOR #2263355494704 len=41 dep=1 uid=0 oct=3 lid=0 tim=307947220215 hv=387538332 ad='7ff769b447b0' sqlid='15knr3nbjkrcw'
+SELECT ORA_PLAN_ID_SEQ$.NEXTVAL FROM DUAL
+END OF STMT
+PARSE #2263355494704:c=18,e=18,p=0,cr=0,cu=0,mis=0,r=0,dep=1,og=4,plh=2501920895,tim=307947220215
+EXEC #2263355494704:c=11,e=11,p=0,cr=0,cu=0,mis=0,r=0,dep=1,og=4,plh=2501920895,tim=307947220265
+FETCH #2263355494704:c=8,e=8,p=0,cr=0,cu=0,mis=0,r=1,dep=1,og=4,plh=2501920895,tim=307947220285
+STAT #2263355494704 id=1 cnt=1 pid=0 pos=1 obj=7847 op='SEQUENCE  ORA_PLAN_ID_SEQ$ (cr=0 pr=0 pw=0 str=1 time=11 us)'
+STAT #2263355494704 id=2 cnt=1 pid=1 pos=1 obj=0 op='FAST DUAL  (cr=0 pr=0 pw=0 str=1 time=1 us cost=2 size=0 card=1)'
+CLOSE #2263355494704:c=1,e=1,dep=1,type=0,tim=307947220348
+EXEC #2263354016680:c=57,e=57,p=0,cr=1,cu=1,mis=0,r=1,dep=1,og=1,plh=0,tim=307947220448
+STAT #2263354016680 id=1 cnt=0 pid=0 pos=1 obj=7848 op='LOAD TABLE CONVENTIONAL  PLAN_TABLE (cr=1 pr=0 pw=0 str=1 time=33 us)'
+EXEC #2263354016680:c=664,e=664,p=0,cr=1,cu=3,mis=1,r=1,dep=1,og=1,plh=0,tim=307947221202
+EXEC #2263354016680:c=448,e=448,p=0,cr=1,cu=1,mis=1,r=1,dep=1,og=1,plh=0,tim=307947221709
+EXEC #2263354016680:c=38,e=38,p=0,cr=0,cu=1,mis=0,r=1,dep=1,og=1,plh=0,tim=307947221827
+EXEC #2263354016680:c=18,e=18,p=0,cr=0,cu=1,mis=0,r=1,dep=1,og=1,plh=0,tim=307947221888
+EXEC #2263354016680:c=15,e=15,p=0,cr=0,cu=1,mis=0,r=1,dep=1,og=1,plh=0,tim=307947221945
+EXEC #2263354016680:c=15,e=15,p=0,cr=0,cu=1,mis=0,r=1,dep=1,og=1,plh=0,tim=307947222001
+EXEC #2263354016680:c=427,e=427,p=0,cr=1,cu=1,mis=1,r=1,dep=1,og=1,plh=0,tim=307947222471
+CLOSE #2263354016680:c=2,e=2,dep=1,type=0,tim=307947222499
+EXEC #2263352082672:c=2395,e=2395,p=0,cr=4,cu=10,mis=0,r=0,dep=0,og=1,plh=3398621893,tim=307947222511
+CLOSE #2263352082672:c=2,e=2,dep=0,type=0,tim=307947222672
+=====================
+PARSING IN CURSOR #2263352082672 len=74 dep=0 uid=109 oct=3 lid=109 tim=307947222720 hv=920998108 ad='7ff76a9e7980' sqlid='3s1hh8cvfan6w'
+SELECT PLAN_TABLE_OUTPUT FROM TABLE(DBMS_XPLAN.DISPLAY('PLAN_TABLE', :1))
+END OF STMT
+PARSE #2263352082672:c=24,e=24,p=0,cr=0,cu=0,mis=0,r=0,dep=0,og=1,plh=2137789089,tim=307947222720
+EXEC #2263352082672:c=31,e=31,p=0,cr=0,cu=0,mis=0,r=0,dep=0,og=1,plh=2137789089,tim=307947222793
+=====================
+PARSING IN CURSOR #2263351386304 len=90 dep=1 uid=0 oct=3 lid=0 tim=307947222912 hv=3522773882 ad='7ff7673e2c68' sqlid='f7b069b8zkhvu'
+SELECT to_number(value)
+         FROM sys.v$parameter
+         WHERE name = '_qa_lrg_type'
+END OF STMT
+PARSE #2263351386304:c=14,e=13,p=0,cr=0,cu=0,mis=0,r=0,dep=1,og=1,plh=4250213283,tim=307947222911
+EXEC #2263351386304:c=13,e=13,p=0,cr=0,cu=0,mis=0,r=0,dep=1,og=1,plh=4250213283,tim=307947222968
+FETCH #2263351386304:c=0,e=2771,p=0,cr=0,cu=0,mis=0,r=0,dep=1,og=1,plh=4250213283,tim=307947225785
+STAT #2263351386304 id=1 cnt=0 pid=0 pos=1 obj=0 op='HASH JOIN  (cr=0 pr=0 pw=0 str=1 time=2775 us cost=1 size=58 card=1)'
+STAT #2263351386304 id=2 cnt=1 pid=1 pos=1 obj=0 op='FIXED TABLE FIXED INDEX X$KSPPI (ind:1) (cr=0 pr=0 pw=0 str=1 time=74 us cost=0 size=38 card=1)'
+STAT #2263351386304 id=3 cnt=5982 pid=1 pos=2 obj=0 op='FIXED TABLE FULL X$KSPPCV (cr=0 pr=0 pw=0 str=1 time=5464 us cost=1 size=119640 card=5982)'
+CLOSE #2263351386304:c=0,e=0,dep=1,type=3,tim=307947225927
+=====================
+PARSING IN CURSOR #2263354342696 len=146 dep=1 uid=109 oct=3 lid=109 tim=307947226071 hv=1143412014 ad='7ff7676c2768' sqlid='13fz57d22f59f'
+select /*+ opt_param('parallel_execution_enabled',
+                                   'false') EXEC_FROM_DBMS_XPLAN */ * from PLAN_TABLE where 1=0
+END OF STMT
+PARSE #2263354342696:c=0,e=24,p=0,cr=0,cu=0,mis=0,r=0,dep=1,og=1,plh=1067809428,tim=307947226071
+EXEC #2263354342696:c=0,e=13,p=0,cr=0,cu=0,mis=0,r=0,dep=1,og=1,plh=1067809428,tim=307947226129
+STAT #2263354342696 id=1 cnt=0 pid=0 pos=1 obj=0 op='FILTER  (cr=0 pr=0 pw=0 str=1 time=1 us)'
+STAT #2263354342696 id=2 cnt=0 pid=1 pos=1 obj=7848 op='TABLE ACCESS FULL PLAN_TABLE$ (cr=0 pr=0 pw=0 str=0 time=0 us cost=2 size=22652 card=2)'
+CLOSE #2263354342696:c=0,e=56,dep=1,type=0,tim=307947226287
+=====================
+PARSING IN CURSOR #2263354340568 len=910 dep=1 uid=109 oct=3 lid=109 tim=307947226338 hv=1859174542 ad='7ff783827908' sqlid='8zvjs5drd1h4f'
+SELECT /*+ opt_param('parallel_execution_enabled','false') */
+                         /* EXEC_FROM_DBMS_XPLAN */ id, parent_id, partition_id, timestamp, optimizer, position, search_columns, depth, operation, options, object_name, object_owner, object_type, object_instance, cardinality, bytes, temp_space, cost, io_cost, cpu_cost, time, partition_start, partition_stop, object_node, other_tag, distribution, null projection, access_predicates, filter_predicates, other, qblock_name, object_alias, nvl(other_xml, remarks) other_xml, null sql_profile, null sql_plan_baseline, null, null, null, null, null, null, null,
+                            null, null, null, null, null,
+                            null, null, null, null from PLAN_TABLE where plan_id = (select max(plan_id)
+                                        from PLAN_TABLE where id=0  and statement_id = :stmt_id)
+                       order by id
+END OF STMT
+PARSE #2263354340568:c=0,e=19,p=0,cr=0,cu=0,mis=0,r=0,dep=1,og=1,plh=58185665,tim=307947226337
+EXEC #2263354340568:c=0,e=20,p=0,cr=0,cu=0,mis=0,r=0,dep=1,og=1,plh=58185665,tim=307947226401
+EXEC #2263361651304:c=0,e=10,p=0,cr=0,cu=0,mis=0,r=0,dep=1,og=1,plh=992138068,tim=307947226432
+EXEC #2263351386304:c=0,e=10,p=0,cr=0,cu=0,mis=0,r=0,dep=2,og=1,plh=4250213283,tim=307947226516
+FETCH #2263351386304:c=6297,e=2825,p=0,cr=0,cu=0,mis=0,r=0,dep=2,og=1,plh=4250213283,tim=307947229380
+CLOSE #2263351386304:c=0,e=0,dep=2,type=3,tim=307947229409
+FETCH #2263354340568:c=98,e=98,p=0,cr=6,cu=0,mis=0,r=1,dep=2,og=1,plh=58185665,tim=307947229534
+FETCH #2263354340568:c=6,e=6,p=0,cr=0,cu=0,mis=0,r=1,dep=2,og=1,plh=58185665,tim=307947229580
+EXEC #2263351386304:c=10,e=10,p=0,cr=0,cu=0,mis=0,r=0,dep=2,og=1,plh=4250213283,tim=307947229653
+FETCH #2263351386304:c=2400,e=2400,p=0,cr=0,cu=0,mis=0,r=0,dep=2,og=1,plh=4250213283,tim=307947232087
+CLOSE #2263351386304:c=0,e=0,dep=2,type=3,tim=307947232112
+EXEC #2263362874048:c=41,e=41,p=0,cr=0,cu=0,mis=0,r=0,dep=2,og=1,plh=1388734953,tim=307947232178
+FETCH #2263362874048:c=3771,e=3771,p=0,cr=0,cu=0,mis=0,r=1,dep=2,og=1,plh=1388734953,tim=307947235978
+CLOSE #2263362874048:c=0,e=0,dep=2,type=3,tim=307947236020
+EXEC #2263350710288:c=13,e=13,p=0,cr=0,cu=0,mis=0,r=0,dep=2,og=1,plh=1388734953,tim=307947236054
+FETCH #2263350710288:c=403,e=403,p=0,cr=0,cu=0,mis=0,r=1,dep=2,og=1,plh=1388734953,tim=307947236471
+CLOSE #2263350710288:c=1,e=1,dep=2,type=3,tim=307947236506
+EXEC #2263352097976:c=477,e=476,p=0,cr=0,cu=0,mis=0,r=0,dep=2,og=1,plh=1186311642,tim=307947237190
+FETCH #2263352097976:c=6,e=6,p=0,cr=0,cu=0,mis=0,r=0,dep=2,og=1,plh=1186311642,tim=307947237215
+CLOSE #2263352097976:c=0,e=1,dep=2,type=3,tim=307947237241
+FETCH #2263354340568:c=5,e=5,p=0,cr=0,cu=0,mis=0,r=1,dep=2,og=1,plh=58185665,tim=307947237270
+FETCH #2263354340568:c=4,e=4,p=0,cr=0,cu=0,mis=0,r=1,dep=2,og=1,plh=58185665,tim=307947237295
+FETCH #2263354340568:c=4,e=4,p=0,cr=0,cu=0,mis=0,r=1,dep=2,og=1,plh=58185665,tim=307947237315
+FETCH #2263354340568:c=3,e=3,p=0,cr=0,cu=0,mis=0,r=1,dep=2,og=1,plh=58185665,tim=307947237334
+FETCH #2263354340568:c=3,e=3,p=0,cr=0,cu=0,mis=0,r=1,dep=2,og=1,plh=58185665,tim=307947237352
+FETCH #2263354340568:c=3,e=3,p=0,cr=0,cu=0,mis=0,r=1,dep=2,og=1,plh=58185665,tim=307947237371
+FETCH #2263354340568:c=4,e=4,p=0,cr=0,cu=0,mis=0,r=0,dep=2,og=1,plh=58185665,tim=307947237391
+STAT #2263354340568 id=1 cnt=8 pid=0 pos=1 obj=0 op='SORT ORDER BY (cr=6 pr=0 pw=0 str=1 time=88 us cost=5 size=9307 card=1)'
+STAT #2263354340568 id=2 cnt=8 pid=1 pos=1 obj=7848 op='TABLE ACCESS FULL PLAN_TABLE$ (cr=6 pr=0 pw=0 str=1 time=75 us cost=2 size=9307 card=1)'
+STAT #2263354340568 id=3 cnt=1 pid=2 pos=1 obj=0 op='SORT AGGREGATE (cr=3 pr=0 pw=0 str=1 time=22 us)'
+STAT #2263354340568 id=4 cnt=1 pid=3 pos=1 obj=7848 op='TABLE ACCESS FULL PLAN_TABLE$ (cr=3 pr=0 pw=0 str=1 time=16 us cost=2 size=43 card=1)'
+FETCH #2263361651304:c=14685,e=11325,p=0,cr=6,cu=0,mis=0,r=21,dep=1,og=1,plh=992138068,tim=307947237768
+FETCH #2263352082672:c=14917,e=14985,p=0,cr=6,cu=0,mis=0,r=1,dep=0,og=1,plh=2137789089,tim=307947237800
+FETCH #2263352082672:c=16,e=16,p=0,cr=0,cu=0,mis=0,r=15,dep=0,og=1,plh=2137789089,tim=307947238021
+CLOSE #2263361651304:c=0,e=0,dep=1,type=3,tim=307947240671
+CLOSE #2263354340568:c=0,e=6,dep=1,type=0,tim=307947240696
+FETCH #2263352082672:c=0,e=57,p=0,cr=0,cu=0,mis=0,r=5,dep=0,og=1,plh=2137789089,tim=307947240716
+STAT #2263352082672 id=1 cnt=21 pid=0 pos=1 obj=0 op='COLLECTION ITERATOR PICKLER FETCH DISPLAY (cr=6 pr=0 pw=0 str=1 time=14983 us cost=29 size=16336 card=8168)'
+CLOSE #2263352082672:c=0,e=4,dep=0,type=0,tim=307947241960
+PARSE #2263330417016:c=0,e=9,p=0,cr=0,cu=0,mis=0,r=0,dep=0,og=1,plh=2637181423,tim=307947241993
+EXEC #2263330417016:c=0,e=93,p=0,cr=3,cu=8,mis=0,r=8,dep=0,og=1,plh=2637181423,tim=307947242101
+*** SESSION ID:(984.26613) 2022-01-25T04:34:26.115754+01:00
+*** CONTAINER ID:(3) 2022-01-25T04:34:26.115754+01:00
+*** CLIENT IP:(127.0.0.1) 2022-01-25T04:34:26.115754+01:00
+ 
+CLOSE #2263330417016:c=0,e=2,dep=0,type=3,tim=307947247830
+=====================
+PARSING IN CURSOR #2263352082672 len=116 dep=0 uid=109 oct=3 lid=109 tim=307947249120 hv=3359286792 ad='7ff76aded098' sqlid='9ykmn8z43p9h8'
+select dname, ename, sal
+from emp e, dept d
+where d.deptno=e.deptno
+and job in ('PRESIDENT', 'CLERK')
+order by dname
+END OF STMT
+PARSE #2263352082672:c=0,e=1227,p=0,cr=0,cu=0,mis=1,r=0,dep=0,og=1,plh=3397560255,tim=307947249120
+EXEC #2263352082672:c=0,e=17,p=0,cr=0,cu=0,mis=0,r=0,dep=0,og=1,plh=3397560255,tim=307947249182
+FETCH #2263352082672:c=0,e=43,p=0,cr=5,cu=0,mis=0,r=1,dep=0,og=1,plh=3397560255,tim=307947249246
+FETCH #2263352082672:c=0,e=7,p=0,cr=0,cu=0,mis=0,r=4,dep=0,og=1,plh=3397560255,tim=307947249399
+STAT #2263352082672 id=1 cnt=5 pid=0 pos=1 obj=0 op='SORT ORDER BY (cr=5 pr=0 pw=0 str=1 time=45 us cost=6 size=204 card=6)'
+STAT #2263352082672 id=2 cnt=5 pid=1 pos=1 obj=0 op='MERGE JOIN  (cr=5 pr=0 pw=0 str=1 time=31 us cost=5 size=204 card=6)'
+STAT #2263352082672 id=3 cnt=4 pid=2 pos=1 obj=77926 op='TABLE ACCESS BY INDEX ROWID DEPT (cr=2 pr=0 pw=0 str=1 time=13 us cost=2 size=52 card=4)'
+STAT #2263352082672 id=4 cnt=4 pid=3 pos=1 obj=77927 op='INDEX FULL SCAN PK_DEPT (cr=1 pr=0 pw=0 str=1 time=8 us cost=1 size=0 card=4)'
+STAT #2263352082672 id=5 cnt=5 pid=2 pos=2 obj=0 op='SORT JOIN (cr=3 pr=0 pw=0 str=4 time=18 us cost=3 size=126 card=6)'
+STAT #2263352082672 id=6 cnt=5 pid=5 pos=1 obj=0 op='INLIST ITERATOR  (cr=3 pr=0 pw=0 str=1 time=10 us)'
+STAT #2263352082672 id=7 cnt=5 pid=6 pos=1 obj=77924 op='TABLE ACCESS BY INDEX ROWID BATCHED EMP (cr=3 pr=0 pw=0 str=2 time=11 us cost=2 size=126 card=6)'
+STAT #2263352082672 id=8 cnt=5 pid=7 pos=1 obj=77934 op='INDEX RANGE SCAN IDX_EMP_JOB_SAL (cr=2 pr=0 pw=0 str=2 time=8 us cost=1 size=0 card=6)'
+*** SESSION ID:(984.26613) 2022-01-25T04:34:26.119814+01:00
+*** CONTAINER ID:(3) 2022-01-25T04:34:26.119814+01:00
+*** CLIENT IP:(127.0.0.1) 2022-01-25T04:34:26.119814+01:00
+ 
+CLOSE #2263352082672:c=0,e=3,dep=0,type=0,tim=307947252608
+PARSE #2263330417016:c=0,e=6,p=0,cr=0,cu=0,mis=0,r=0,dep=0,og=1,plh=2637181423,tim=307947252674
+EXEC #2263330417016:c=0,e=34,p=0,cr=3,cu=0,mis=0,r=0,dep=0,og=1,plh=2637181423,tim=307947252723
+CLOSE #2263330417016:c=0,e=4,dep=0,type=3,tim=307947255252
+=====================
+PARSING IN CURSOR #2263352082672 len=163 dep=0 uid=109 oct=50 lid=109 tim=307947256634 hv=3699621106 ad='7ff783bf97e8' sqlid='ckud7hmf87g7k'
+EXPLAIN PLAN SET STATEMENT_ID='PLUS130410' FOR select dname, ename, sal
+from emp e, dept d
+where d.deptno=e.deptno
+and job in ('PRESIDENT', 'CLERK')
+order by dname
+END OF STMT
+PARSE #2263352082672:c=0,e=1355,p=0,cr=0,cu=0,mis=1,r=0,dep=0,og=1,plh=3397560255,tim=307947256634
+=====================
+PARSING IN CURSOR #2263362833936 len=586 dep=1 uid=109 oct=2 lid=109 tim=307947256734 hv=2508123768 ad='7ff76a95aa58' sqlid='99qa3zyarxvms'
+insert into plan_table (statement_id, timestamp, operation, options,object_node, object_owner, object_name, object_instance, object_type,search_columns, id, parent_id, position, other,optimizer, cost, cardinality, bytes, other_tag, partition_start, partition_stop, partition_id, distribution, cpu_cost, io_cost, temp_space, access_predicates, filter_predicates, projection, time, qblock_name, object_alias, plan_id, depth, remarks, other_xml ) values(:1,:2,:3,:4,:5,:6,:7,:8,:9,:10,:11,:12,:13,:14,:15,:16,:17,:18,:19,:20,:21,:22,:23,:24,:25,:26,:27,:28,:29,:30,:31,:32,:33,:34,:35,:36)
+END OF STMT
+PARSE #2263362833936:c=0,e=31,p=0,cr=0,cu=0,mis=0,r=0,dep=1,og=1,plh=0,tim=307947256734
+=====================
+PARSING IN CURSOR #2263361588296 len=41 dep=1 uid=0 oct=3 lid=0 tim=307947256790 hv=387538332 ad='7ff769b447b0' sqlid='15knr3nbjkrcw'
+SELECT ORA_PLAN_ID_SEQ$.NEXTVAL FROM DUAL
+END OF STMT
+PARSE #2263361588296:c=0,e=10,p=0,cr=0,cu=0,mis=0,r=0,dep=1,og=4,plh=2501920895,tim=307947256790
+EXEC #2263361588296:c=0,e=15,p=0,cr=0,cu=0,mis=0,r=0,dep=1,og=4,plh=2501920895,tim=307947256844
+FETCH #2263361588296:c=0,e=10,p=0,cr=0,cu=0,mis=0,r=1,dep=1,og=4,plh=2501920895,tim=307947256868
+STAT #2263361588296 id=1 cnt=1 pid=0 pos=1 obj=7847 op='SEQUENCE  ORA_PLAN_ID_SEQ$ (cr=0 pr=0 pw=0 str=1 time=13 us)'
+STAT #2263361588296 id=2 cnt=1 pid=1 pos=1 obj=0 op='FAST DUAL  (cr=0 pr=0 pw=0 str=1 time=0 us cost=2 size=0 card=1)'
+CLOSE #2263361588296:c=0,e=8,dep=1,type=1,tim=307947256940
+EXEC #2263362833936:c=0,e=61,p=0,cr=1,cu=1,mis=0,r=1,dep=1,og=1,plh=0,tim=307947257044
+STAT #2263362833936 id=1 cnt=0 pid=0 pos=1 obj=7848 op='LOAD TABLE CONVENTIONAL  PLAN_TABLE (cr=1 pr=0 pw=0 str=1 time=46 us)'
+EXEC #2263362833936:c=0,e=558,p=0,cr=1,cu=1,mis=1,r=1,dep=1,og=1,plh=0,tim=307947257697
+EXEC #2263362833936:c=0,e=32,p=0,cr=1,cu=1,mis=0,r=1,dep=1,og=1,plh=0,tim=307947257790
+EXEC #2263362833936:c=0,e=18,p=0,cr=0,cu=1,mis=0,r=1,dep=1,og=1,plh=0,tim=307947257854
+EXEC #2263362833936:c=0,e=16,p=0,cr=0,cu=1,mis=0,r=1,dep=1,og=1,plh=0,tim=307947257913
+EXEC #2263362833936:c=0,e=16,p=0,cr=0,cu=1,mis=0,r=1,dep=1,og=1,plh=0,tim=307947257971
+EXEC #2263362833936:c=0,e=16,p=0,cr=0,cu=1,mis=0,r=1,dep=1,og=1,plh=0,tim=307947258028
+EXEC #2263362833936:c=0,e=16,p=0,cr=0,cu=1,mis=0,r=1,dep=1,og=1,plh=0,tim=307947258086
+EXEC #2263362833936:c=0,e=15,p=0,cr=0,cu=1,mis=0,r=1,dep=1,og=1,plh=0,tim=307947258143
+CLOSE #2263362833936:c=0,e=2,dep=1,type=0,tim=307947258160
+EXEC #2263352082672:c=0,e=1490,p=0,cr=3,cu=9,mis=0,r=0,dep=0,og=1,plh=3397560255,tim=307947258172
+CLOSE #2263352082672:c=0,e=2,dep=0,type=0,tim=307947258411
+=====================
+PARSING IN CURSOR #2263352082672 len=74 dep=0 uid=109 oct=3 lid=109 tim=307947258491 hv=920998108 ad='7ff76a9e7980' sqlid='3s1hh8cvfan6w'
+SELECT PLAN_TABLE_OUTPUT FROM TABLE(DBMS_XPLAN.DISPLAY('PLAN_TABLE', :1))
+END OF STMT
+PARSE #2263352082672:c=0,e=11,p=0,cr=0,cu=0,mis=0,r=0,dep=0,og=1,plh=2137789089,tim=307947258490
+EXEC #2263352082672:c=0,e=11,p=0,cr=0,cu=0,mis=0,r=0,dep=0,og=1,plh=2137789089,tim=307947258542
+=====================
+PARSING IN CURSOR #2263345333360 len=90 dep=1 uid=0 oct=3 lid=0 tim=307947258663 hv=3522773882 ad='7ff7673e2c68' sqlid='f7b069b8zkhvu'
+SELECT to_number(value)
+         FROM sys.v$parameter
+         WHERE name = '_qa_lrg_type'
+END OF STMT
+PARSE #2263345333360:c=0,e=9,p=0,cr=0,cu=0,mis=0,r=0,dep=1,og=1,plh=4250213283,tim=307947258663
+EXEC #2263345333360:c=0,e=13,p=0,cr=0,cu=0,mis=0,r=0,dep=1,og=1,plh=4250213283,tim=307947258714
+FETCH #2263345333360:c=6964,e=2470,p=0,cr=0,cu=0,mis=0,r=0,dep=1,og=1,plh=4250213283,tim=307947261231
+STAT #2263345333360 id=1 cnt=0 pid=0 pos=1 obj=0 op='HASH JOIN  (cr=0 pr=0 pw=0 str=1 time=2474 us cost=1 size=58 card=1)'
+STAT #2263345333360 id=2 cnt=1 pid=1 pos=1 obj=0 op='FIXED TABLE FIXED INDEX X$KSPPI (ind:1) (cr=0 pr=0 pw=0 str=1 time=78 us cost=0 size=38 card=1)'
+STAT #2263345333360 id=3 cnt=5982 pid=1 pos=2 obj=0 op='FIXED TABLE FULL X$KSPPCV (cr=0 pr=0 pw=0 str=1 time=2476 us cost=1 size=119640 card=5982)'
+CLOSE #2263345333360:c=1,e=1,dep=1,type=3,tim=307947261346
+=====================
+PARSING IN CURSOR #2263352116584 len=146 dep=1 uid=109 oct=3 lid=109 tim=307947261465 hv=1143412014 ad='7ff7676c2768' sqlid='13fz57d22f59f'
+select /*+ opt_param('parallel_execution_enabled',
+                                   'false') EXEC_FROM_DBMS_XPLAN */ * from PLAN_TABLE where 1=0
+END OF STMT
+PARSE #2263352116584:c=13,e=13,p=0,cr=0,cu=0,mis=0,r=0,dep=1,og=1,plh=1067809428,tim=307947261465
+EXEC #2263352116584:c=11,e=11,p=0,cr=0,cu=0,mis=0,r=0,dep=1,og=1,plh=1067809428,tim=307947261520
+STAT #2263352116584 id=1 cnt=0 pid=0 pos=1 obj=0 op='FILTER  (cr=0 pr=0 pw=0 str=1 time=1 us)'
+STAT #2263352116584 id=2 cnt=0 pid=1 pos=1 obj=7848 op='TABLE ACCESS FULL PLAN_TABLE$ (cr=0 pr=0 pw=0 str=0 time=0 us cost=2 size=22652 card=2)'
+CLOSE #2263352116584:c=58,e=57,dep=1,type=1,tim=307947261675
+=====================
+PARSING IN CURSOR #2263354009368 len=910 dep=1 uid=109 oct=3 lid=109 tim=307947261714 hv=1859174542 ad='7ff783827908' sqlid='8zvjs5drd1h4f'
+SELECT /*+ opt_param('parallel_execution_enabled','false') */
+                         /* EXEC_FROM_DBMS_XPLAN */ id, parent_id, partition_id, timestamp, optimizer, position, search_columns, depth, operation, options, object_name, object_owner, object_type, object_instance, cardinality, bytes, temp_space, cost, io_cost, cpu_cost, time, partition_start, partition_stop, object_node, other_tag, distribution, null projection, access_predicates, filter_predicates, other, qblock_name, object_alias, nvl(other_xml, remarks) other_xml, null sql_profile, null sql_plan_baseline, null, null, null, null, null, null, null,
+                            null, null, null, null, null,
+                            null, null, null, null from PLAN_TABLE where plan_id = (select max(plan_id)
+                                        from PLAN_TABLE where id=0  and statement_id = :stmt_id)
+                       order by id
+END OF STMT
+PARSE #2263354009368:c=11,e=11,p=0,cr=0,cu=0,mis=0,r=0,dep=1,og=1,plh=58185665,tim=307947261714
+EXEC #2263354009368:c=18,e=18,p=0,cr=0,cu=0,mis=0,r=0,dep=1,og=1,plh=58185665,tim=307947261773
+EXEC #2263361651304:c=10,e=10,p=0,cr=0,cu=0,mis=0,r=0,dep=1,og=1,plh=992138068,tim=307947261804
+EXEC #2263345333360:c=10,e=10,p=0,cr=0,cu=0,mis=0,r=0,dep=2,og=1,plh=4250213283,tim=307947261880
+FETCH #2263345333360:c=2510,e=2510,p=0,cr=0,cu=0,mis=0,r=0,dep=2,og=1,plh=4250213283,tim=307947264426
+CLOSE #2263345333360:c=1,e=1,dep=2,type=3,tim=307947264453
+FETCH #2263354009368:c=91,e=91,p=0,cr=6,cu=0,mis=0,r=1,dep=2,og=1,plh=58185665,tim=307947264569
+FETCH #2263354009368:c=7,e=7,p=0,cr=0,cu=0,mis=0,r=1,dep=2,og=1,plh=58185665,tim=307947264654
+EXEC #2263345333360:c=10,e=10,p=0,cr=0,cu=0,mis=0,r=0,dep=2,og=1,plh=4250213283,tim=307947264729
+FETCH #2263345333360:c=2470,e=2471,p=0,cr=0,cu=0,mis=0,r=0,dep=2,og=1,plh=4250213283,tim=307947267233
+CLOSE #2263345333360:c=1,e=1,dep=2,type=3,tim=307947267259
+EXEC #2263362874048:c=40,e=40,p=0,cr=0,cu=0,mis=0,r=0,dep=2,og=1,plh=1388734953,tim=307947267323
+FETCH #2263362874048:c=0,e=3881,p=0,cr=0,cu=0,mis=0,r=1,dep=2,og=1,plh=1388734953,tim=307947271233
+CLOSE #2263362874048:c=0,e=1,dep=2,type=3,tim=307947271281
+EXEC #2263350710288:c=0,e=14,p=0,cr=0,cu=0,mis=0,r=0,dep=2,og=1,plh=1388734953,tim=307947271316
+FETCH #2263350710288:c=0,e=424,p=0,cr=0,cu=0,mis=0,r=1,dep=2,og=1,plh=1388734953,tim=307947271755
+CLOSE #2263350710288:c=0,e=1,dep=2,type=3,tim=307947271788
+EXEC #2263352097976:c=0,e=395,p=0,cr=0,cu=0,mis=0,r=0,dep=2,og=1,plh=1186311642,tim=307947272399
+FETCH #2263352097976:c=0,e=6,p=0,cr=0,cu=0,mis=0,r=0,dep=2,og=1,plh=1186311642,tim=307947272424
+CLOSE #2263352097976:c=0,e=0,dep=2,type=3,tim=307947272451
+FETCH #2263354009368:c=0,e=7,p=0,cr=0,cu=0,mis=0,r=1,dep=2,og=1,plh=58185665,tim=307947272485
+FETCH #2263354009368:c=0,e=3,p=0,cr=0,cu=0,mis=0,r=1,dep=2,og=1,plh=58185665,tim=307947272510
+FETCH #2263354009368:c=0,e=4,p=0,cr=0,cu=0,mis=0,r=1,dep=2,og=1,plh=58185665,tim=307947272532
+FETCH #2263354009368:c=0,e=3,p=0,cr=0,cu=0,mis=0,r=1,dep=2,og=1,plh=58185665,tim=307947272551
+FETCH #2263354009368:c=0,e=3,p=0,cr=0,cu=0,mis=0,r=1,dep=2,og=1,plh=58185665,tim=307947272571
+FETCH #2263354009368:c=0,e=3,p=0,cr=0,cu=0,mis=0,r=1,dep=2,og=1,plh=58185665,tim=307947272590
+FETCH #2263354009368:c=0,e=3,p=0,cr=0,cu=0,mis=0,r=1,dep=2,og=1,plh=58185665,tim=307947272609
+FETCH #2263354009368:c=0,e=4,p=0,cr=0,cu=0,mis=0,r=0,dep=2,og=1,plh=58185665,tim=307947272632
+STAT #2263354009368 id=1 cnt=9 pid=0 pos=1 obj=0 op='SORT ORDER BY (cr=6 pr=0 pw=0 str=1 time=82 us cost=5 size=9307 card=1)'
+STAT #2263354009368 id=2 cnt=9 pid=1 pos=1 obj=7848 op='TABLE ACCESS FULL PLAN_TABLE$ (cr=6 pr=0 pw=0 str=1 time=67 us cost=2 size=9307 card=1)'
+STAT #2263354009368 id=3 cnt=1 pid=2 pos=1 obj=0 op='SORT AGGREGATE (cr=3 pr=0 pw=0 str=1 time=20 us)'
+STAT #2263354009368 id=4 cnt=1 pid=3 pos=1 obj=7848 op='TABLE ACCESS FULL PLAN_TABLE$ (cr=3 pr=0 pw=0 str=1 time=16 us cost=2 size=43 card=1)'
+FETCH #2263361651304:c=5536,e=11169,p=0,cr=6,cu=0,mis=0,r=22,dep=1,og=1,plh=992138068,tim=307947272985
+FETCH #2263352082672:c=13085,e=14453,p=0,cr=6,cu=0,mis=0,r=1,dep=0,og=1,plh=2137789089,tim=307947273018
+FETCH #2263352082672:c=0,e=17,p=0,cr=0,cu=0,mis=0,r=15,dep=0,og=1,plh=2137789089,tim=307947273251
+CLOSE #2263361651304:c=0,e=1,dep=1,type=3,tim=307947275917
+CLOSE #2263354009368:c=0,e=14,dep=1,type=1,tim=307947275951
+FETCH #2263352082672:c=0,e=68,p=0,cr=0,cu=0,mis=0,r=6,dep=0,og=1,plh=2137789089,tim=307947275971
+STAT #2263352082672 id=1 cnt=22 pid=0 pos=1 obj=0 op='COLLECTION ITERATOR PICKLER FETCH DISPLAY (cr=6 pr=0 pw=0 str=1 time=14450 us cost=29 size=16336 card=8168)'
+CLOSE #2263352082672:c=0,e=10,dep=0,type=1,tim=307947276780
+PARSE #2263330417016:c=0,e=11,p=0,cr=0,cu=0,mis=0,r=0,dep=0,og=1,plh=2637181423,tim=307947276814
+EXEC #2263330417016:c=0,e=119,p=0,cr=3,cu=11,mis=0,r=9,dep=0,og=1,plh=2637181423,tim=307947276948
+CLOSE #2263330417016:c=0,e=2,dep=0,type=3,tim=307947281033
+=====================
+PARSING IN CURSOR #2263352017624 len=50 dep=0 uid=109 oct=47 lid=109 tim=307947281701 hv=567840333 ad='7ff77ec3a068' sqlid='aqynddchxj3kd'
+BEGIN sys.dbms_session.set_sql_trace(false); END;
+
+END OF STMT
+PARSE #2263352017624:c=0,e=647,p=0,cr=0,cu=0,mis=1,r=0,dep=0,og=1,plh=0,tim=307947281701
+=====================
+PARSING IN CURSOR #2263351415728 len=33 dep=1 uid=109 oct=42 lid=109 tim=307947281871 hv=525901419 ad='0' sqlid='aam2chsgpj7mb'
+alter session set sql_trace=false
+END OF STMT
+PARSE #2263351415728:c=0,e=95,p=0,cr=0,cu=0,mis=0,r=0,dep=1,og=0,plh=0,tim=307947281871
+EXEC #2263351415728:c=0,e=43,p=0,cr=0,cu=0,mis=0,r=0,dep=1,og=0,plh=0,tim=307947281955
+EXEC #2263352017624:c=0,e=234,p=0,cr=0,cu=0,mis=0,r=1,dep=0,og=1,plh=0,tim=307947281978
+
+*** 2022-01-25T04:34:47.473699+01:00 (PDBMBDS(3))
+*** SESSION ID:(984.26613) 2022-01-25T04:34:47.473699+01:00
+*** CONTAINER ID:(3) 2022-01-25T04:34:47.473699+01:00
+*** CLIENT IP:(127.0.0.1) 2022-01-25T04:34:47.473699+01:00
+ 
+CLOSE #2263354018400:c=0,e=2,dep=1,type=3,tim=307968605926
+=====================
+PARSING IN CURSOR #2263354007976 len=49 dep=0 uid=109 oct=47 lid=109 tim=307968606007 hv=2024635897 ad='7ff77f19ae38' sqlid='cwaqbn9wauzgt'
+BEGIN sys.dbms_session.set_sql_trace(true); END;
+
+END OF STMT
+EXEC #2263354007976:c=0,e=208,p=0,cr=0,cu=0,mis=0,r=1,dep=0,og=1,plh=0,tim=307968606007
+CLOSE #2263354007976:c=0,e=6,dep=0,type=0,tim=307968609838
+=====================
+PARSING IN CURSOR #2263354007976 len=40 dep=0 uid=109 oct=3 lid=109 tim=307968609885 hv=1109423342 ad='7ff783c0ee20' sqlid='gy9gs2d120x7f'
+select ename
+from emp
+where ename='KING'
+END OF STMT
+PARSE #2263354007976:c=0,e=22,p=0,cr=0,cu=0,mis=0,r=0,dep=0,og=1,plh=4030948918,tim=307968609885
+EXEC #2263354007976:c=0,e=16,p=0,cr=0,cu=0,mis=0,r=0,dep=0,og=1,plh=4030948918,tim=307968609938
+FETCH #2263354007976:c=0,e=11,p=0,cr=1,cu=0,mis=0,r=1,dep=0,og=1,plh=4030948918,tim=307968609971
+FETCH #2263354007976:c=0,e=4,p=0,cr=1,cu=0,mis=0,r=0,dep=0,og=1,plh=4030948918,tim=307968610090
+STAT #2263354007976 id=1 cnt=1 pid=0 pos=1 obj=77933 op='INDEX RANGE SCAN IDX_EMP_ENAME (cr=2 pr=0 pw=0 str=1 time=11 us cost=1 size=6 card=1)'
+CLOSE #2263354007976:c=0,e=2,dep=0,type=0,tim=307968612227
+=====================
+PARSING IN CURSOR #2263354007976 len=101 dep=0 uid=109 oct=3 lid=109 tim=307968612268 hv=2867987160 ad='7ff76a982498' sqlid='07nbcdapg40qs'
+select dname, ename, sal
+from emp e, dept d
+where d.deptno=e.deptno
+and job in ('PRESIDENT', 'CLERK')
+END OF STMT
+PARSE #2263354007976:c=0,e=19,p=0,cr=0,cu=0,mis=0,r=0,dep=0,og=1,plh=3398621893,tim=307968612268
+EXEC #2263354007976:c=0,e=37,p=0,cr=0,cu=0,mis=0,r=0,dep=0,og=1,plh=3398621893,tim=307968612342
+FETCH #2263354007976:c=0,e=71,p=0,cr=5,cu=0,mis=0,r=1,dep=0,og=1,plh=3398621893,tim=307968612459
+FETCH #2263354007976:c=0,e=13,p=0,cr=2,cu=0,mis=0,r=4,dep=0,og=1,plh=3398621893,tim=307968612628
+STAT #2263354007976 id=1 cnt=5 pid=0 pos=1 obj=0 op='MERGE JOIN  (cr=7 pr=0 pw=0 str=1 time=71 us cost=5 size=204 card=6)'
+STAT #2263354007976 id=2 cnt=4 pid=1 pos=1 obj=77926 op='TABLE ACCESS BY INDEX ROWID DEPT (cr=4 pr=0 pw=0 str=1 time=25 us cost=2 size=52 card=4)'
+STAT #2263354007976 id=3 cnt=4 pid=2 pos=1 obj=77927 op='INDEX FULL SCAN PK_DEPT (cr=2 pr=0 pw=0 str=1 time=10 us cost=1 size=0 card=4)'
+STAT #2263354007976 id=4 cnt=5 pid=1 pos=2 obj=0 op='SORT JOIN (cr=3 pr=0 pw=0 str=4 time=61 us cost=3 size=126 card=6)'
+STAT #2263354007976 id=5 cnt=5 pid=4 pos=1 obj=0 op='INLIST ITERATOR  (cr=3 pr=0 pw=0 str=1 time=29 us)'
+STAT #2263354007976 id=6 cnt=5 pid=5 pos=1 obj=77924 op='TABLE ACCESS BY INDEX ROWID BATCHED EMP (cr=3 pr=0 pw=0 str=2 time=30 us cost=2 size=126 card=6)'
+STAT #2263354007976 id=7 cnt=5 pid=6 pos=1 obj=77934 op='INDEX RANGE SCAN IDX_EMP_JOB_SAL (cr=2 pr=0 pw=0 str=2 time=28 us cost=1 size=0 card=6)'
+CLOSE #2263354007976:c=0,e=4,dep=0,type=0,tim=307968616090
+=====================
+PARSING IN CURSOR #2263354007976 len=116 dep=0 uid=109 oct=3 lid=109 tim=307968616132 hv=3359286792 ad='7ff76aded098' sqlid='9ykmn8z43p9h8'
+select dname, ename, sal
+from emp e, dept d
+where d.deptno=e.deptno
+and job in ('PRESIDENT', 'CLERK')
+order by dname
+END OF STMT
+PARSE #2263354007976:c=0,e=18,p=0,cr=0,cu=0,mis=0,r=0,dep=0,og=1,plh=3397560255,tim=307968616131
+EXEC #2263354007976:c=0,e=16,p=0,cr=0,cu=0,mis=0,r=0,dep=0,og=1,plh=3397560255,tim=307968616186
+FETCH #2263354007976:c=0,e=36,p=0,cr=5,cu=0,mis=0,r=1,dep=0,og=1,plh=3397560255,tim=307968616243
+FETCH #2263354007976:c=0,e=8,p=0,cr=0,cu=0,mis=0,r=4,dep=0,og=1,plh=3397560255,tim=307968616382
+STAT #2263354007976 id=1 cnt=5 pid=0 pos=1 obj=0 op='SORT ORDER BY (cr=5 pr=0 pw=0 str=1 time=36 us cost=6 size=204 card=6)'
+STAT #2263354007976 id=2 cnt=5 pid=1 pos=1 obj=0 op='MERGE JOIN  (cr=5 pr=0 pw=0 str=1 time=21 us cost=5 size=204 card=6)'
+STAT #2263354007976 id=3 cnt=4 pid=2 pos=1 obj=77926 op='TABLE ACCESS BY INDEX ROWID DEPT (cr=2 pr=0 pw=0 str=1 time=10 us cost=2 size=52 card=4)'
+STAT #2263354007976 id=4 cnt=4 pid=3 pos=1 obj=77927 op='INDEX FULL SCAN PK_DEPT (cr=1 pr=0 pw=0 str=1 time=3 us cost=1 size=0 card=4)'
+STAT #2263354007976 id=5 cnt=5 pid=2 pos=2 obj=0 op='SORT JOIN (cr=3 pr=0 pw=0 str=4 time=15 us cost=3 size=126 card=6)'
+STAT #2263354007976 id=6 cnt=5 pid=5 pos=1 obj=0 op='INLIST ITERATOR  (cr=3 pr=0 pw=0 str=1 time=8 us)'
+STAT #2263354007976 id=7 cnt=5 pid=6 pos=1 obj=77924 op='TABLE ACCESS BY INDEX ROWID BATCHED EMP (cr=3 pr=0 pw=0 str=2 time=5 us cost=2 size=126 card=6)'
+STAT #2263354007976 id=8 cnt=5 pid=7 pos=1 obj=77934 op='INDEX RANGE SCAN IDX_EMP_JOB_SAL (cr=2 pr=0 pw=0 str=2 time=4 us cost=1 size=0 card=6)'
+CLOSE #2263354007976:c=0,e=3,dep=0,type=0,tim=307968619614
+=====================
+PARSING IN CURSOR #2263354007976 len=50 dep=0 uid=109 oct=47 lid=109 tim=307968619700 hv=567840333 ad='7ff77ec3a068' sqlid='aqynddchxj3kd'
+BEGIN sys.dbms_session.set_sql_trace(false); END;
+
+END OF STMT
+PARSE #2263354007976:c=0,e=62,p=0,cr=0,cu=0,mis=0,r=0,dep=0,og=1,plh=0,tim=307968619700
+PARSE #2263351415728:c=0,e=2,p=0,cr=0,cu=0,mis=0,r=0,dep=1,og=0,plh=0,tim=307968619785
+EXEC #2263351415728:c=6540,e=45,p=0,cr=0,cu=0,mis=0,r=0,dep=1,og=0,plh=0,tim=307968619844
+EXEC #2263354007976:c=6557,e=120,p=0,cr=0,cu=0,mis=0,r=1,dep=0,og=1,plh=0,tim=307968619862

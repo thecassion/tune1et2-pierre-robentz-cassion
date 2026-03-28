@@ -1,0 +1,26 @@
+services:
+  oracle-db:
+    image: gvenzl/oracle-free:latest
+    container_name: oracle-tuning
+    environment:
+      - ORACLE_PASSWORD=Oracle123
+      - ORACLE_DATABASE=ORCLPDB1
+    ports:
+      - "1521:1521"
+      - "5500:5500"
+    volumes:
+      - oracle-data:/opt/oracle/oradata
+      - ./ExemplesFonctionnementOptimiseur:/opt/oracle/scripts/ExemplesFonctionnementOptimiseur
+      - ./TP_TUNE1_MODELE_2025_2026:/opt/oracle/scripts/TP_TUNE1_MODELE_2025_2026
+      - ./TP_TUNE2_MODELE_2025_2026:/opt/oracle/scripts/TP_TUNE2_MODELE_2025_2026
+      - ./TpTuningModele_VM_Sergio:/opt/oracle/scripts/TpTuningModele_VM_Sergio
+      - ./scripts/startdb:/container-entrypoint-startdb.d
+    healthcheck:
+      test: ["CMD", "healthcheck.sh"]
+      interval: 30s
+      timeout: 10s
+      retries: 10
+      start_period: 120s
+
+volumes:
+  oracle-data:

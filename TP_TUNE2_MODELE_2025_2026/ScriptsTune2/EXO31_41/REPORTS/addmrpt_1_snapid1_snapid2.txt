@@ -1,0 +1,204 @@
+          ADDM Report for Task 'TASK_136'
+          -------------------------------
+
+Analysis Period
+---------------
+AWR snapshot range from 48 to 60.
+Time period starts at 28-MAR-26 12.00.19 AM
+Time period ends at 28-MAR-26 03.15.44 AM
+
+Analysis Target
+---------------
+Database 'FREE' with DB ID 1497016487.
+Database version 23.0.0.0.0.
+ADDM performed an analysis of instance FREE, numbered 1 and hosted at
+d67e1e35b505.
+ADDM detected that the database type is MULTITENANT DB.
+
+Activity During the Analysis Period
+-----------------------------------
+Total database time was 764 seconds.
+The average number of active sessions was .07.
+
+Summary of Findings
+-------------------
+   Description         Active Sessions      Recommendations
+                       Percent of Activity
+   ------------------  -------------------  ---------------
+1  Top SQL Statements  .02 | 31.15          3
+2  Log File Switches   .01 | 11.2           2
+3  Hard Parse          0 | 2.49             0
+
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+          Findings and Recommendations
+          ----------------------------
+
+Finding 1: Top SQL Statements
+Impact is .02 active sessions, 31.15% of total activity.
+--------------------------------------------------------
+SQL statements consuming significant database time were found. These
+statements offer a good opportunity for performance improvement.
+
+   Recommendation 1: SQL Tuning
+   Estimated benefit is .01 active sessions, 11.48% of total activity.
+   -------------------------------------------------------------------
+   Action
+      Run SQL Tuning Advisor on the INSERT statement with SQL_ID
+      "c560tsz1ph50d". Additionally, investigate this statement for possible
+      performance improvements. You can supplement the information given here
+      with an ASH report for this SQL_ID.
+      Related Object
+         SQL statement with SQL_ID c560tsz1ph50d.
+         INSERT INTO HEMP4 SELECT * FROM EMP4
+   Rationale
+      The SQL statement executed in container FREEPDB1 with database ID
+      4239942465.
+   Rationale
+      The SQL spent 57% of its database time on CPU, I/O and Cluster waits.
+      This part of database time may be improved by the SQL Tuning Advisor.
+      Look at data given below and an ASH report for further performance
+      improvements.
+   Rationale
+      Database time for this SQL was divided as follows: 100% for SQL
+      execution, 0% for parsing, 0% for PL/SQL execution and 0% for Java
+      execution.
+   Rationale
+      SQL statement with SQL_ID "c560tsz1ph50d" was executed 5 times and had
+      an average elapsed time of 13 seconds.
+
+   Recommendation 2: SQL Tuning
+   Estimated benefit is .01 active sessions, 9.84% of total activity.
+   ------------------------------------------------------------------
+   Action
+      Run SQL Tuning Advisor on the INSERT statement with SQL_ID
+      "gca1cw81ds7cu".
+      Related Object
+         SQL statement with SQL_ID gca1cw81ds7cu.
+         INSERT INTO IEMP4 SELECT * FROM EMP4
+   Rationale
+      The SQL statement executed in container FREEPDB1 with database ID
+      4239942465.
+   Rationale
+      The SQL spent 85% of its database time on CPU, I/O and Cluster waits.
+      This part of database time may be improved by the SQL Tuning Advisor.
+   Rationale
+      Database time for this SQL was divided as follows: 100% for SQL
+      execution, 0% for parsing, 0% for PL/SQL execution and 0% for Java
+      execution.
+   Rationale
+      SQL statement with SQL_ID "gca1cw81ds7cu" was executed 4 times and had
+      an average elapsed time of 18 seconds.
+
+   Recommendation 3: SQL Tuning
+   Estimated benefit is .01 active sessions, 8.2% of total activity.
+   -----------------------------------------------------------------
+   Action
+      Run SQL Tuning Advisor on the INSERT statement with SQL_ID
+      "btrccs7yqjvpq".
+      Related Object
+         SQL statement with SQL_ID btrccs7yqjvpq.
+         INSERT INTO EMP4 VALUES (SEQ4_EMPNO.NEXTVAL,:B1
+         ,'SALESMAN',7698,'28-SEP-1981',1250,1400,30)
+   Rationale
+      The SQL statement executed in container FREEPDB1 with database ID
+      4239942465.
+   Rationale
+      The SQL spent 100% of its database time on CPU, I/O and Cluster waits.
+      This part of database time may be improved by the SQL Tuning Advisor.
+   Rationale
+      Database time for this SQL was divided as follows: 100% for SQL
+      execution, 0% for parsing, 0% for PL/SQL execution and 0% for Java
+      execution.
+   Rationale
+      SQL statement with SQL_ID "btrccs7yqjvpq" was executed 500000 times and
+      had an average elapsed time of 0.00002 seconds.
+
+
+Finding 2: Log File Switches
+Impact is .01 active sessions, 11.2% of total activity.
+-------------------------------------------------------
+Log file switch operations were consuming significant database time while
+waiting for checkpoint completion.
+This problem can be caused by use of hot backup mode on tablespaces.
+DML to tablespaces in hot backup mode causes generation of additional redo.
+
+  Top containers by Redo Generated in KB/sec
+  ------------------------------------------
+  DBID         Container Name   Allocated  KB/sec   Percent
+                                CPUs                of Total
+  -----------  ---------------  ---------  -------  --------
+  4239942465   FREEPDB1         2          1172.86  98.87%
+  1497016487   CDB$ROOT         2          10.95    .92%
+  163682243    ORCLPDB1         2          2.27     .19%
+  Average of all 3 containers:  2          395.44   33.33%
+
+
+  Top containers by Redo Generated in KB/sec per Allocated CPU
+  ------------------------------------------------------------
+  DBID        Container Name  Allocated  KB/sec             KB/sec
+                              CPUs       per Allocated CPU
+  ----------  --------------  ---------  -----------------  -------
+  4239942465  FREEPDB1        2          586.43             1172.86
+  1497016487  CDB$ROOT        2          5.48               10.96
+  163682243   ORCLPDB1        2          1.13               2.26
+
+
+   Recommendation 1: Database Configuration
+   Estimated benefit is .01 active sessions, 11.2% of total activity.
+   ------------------------------------------------------------------
+   Action
+      Verify whether incremental shipping was used for standby databases.
+
+   Recommendation 2: Database Configuration
+   Estimated benefit is .01 active sessions, 11.2% of total activity.
+   ------------------------------------------------------------------
+   Action
+      Increase the size of the log files to 1393 M to hold at least 20 minutes
+      of redo information.
+
+   Symptoms That Led to the Finding:
+   ---------------------------------
+      Wait class "Configuration" was consuming significant database time.
+      Impact is .01 active sessions, 11.34% of total activity.
+
+
+Finding 3: Hard Parse
+Impact is 0 active sessions, 2.49% of total activity.
+-----------------------------------------------------
+Hard parsing of SQL statements was consuming significant database time.
+Hard parses due to cursor environment mismatch were not consuming significant
+database time.
+Hard parsing SQL statements that encountered parse errors was not consuming
+significant database time.
+Hard parses due to literal usage and cursor invalidation were not consuming
+significant database time.
+
+   No recommendations are available.
+
+
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+          Additional Information
+          ----------------------
+
+Miscellaneous Information
+-------------------------
+Wait class "Application" was not consuming significant database time.
+Wait class "Commit" was not consuming significant database time.
+Wait class "Concurrency" was not consuming significant database time.
+CPU was not a bottleneck for the instance.
+Wait class "Network" was not consuming significant database time.
+Wait class "User I/O" was not consuming significant database time.
+Session connect and disconnect calls were not consuming significant database
+time.
+
+The database's maintenance windows were active during 61% of the analysis
+period.
+
+

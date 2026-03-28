@@ -1,0 +1,726 @@
+SQL> 
+SQL> --------------------------------------------------------------------------------------------
+SQL> --------------------------------------------------------------------------------------------
+SQL> -- 1. Supprimer les indexes recommandés dans EXO91 et posés dans EXO91_TUNED
+SQL> --------------------------------------------------------------------------------------------
+SQL> --------------------------------------------------------------------------------------------
+SQL> -- liste des indexes actuels
+SQL> 
+SQL> select table_name, column_name, index_name
+  2  from user_ind_columns
+  3  where table_name in ('CLIENT',  'COMPTE',	'TRANSACTION')
+  4  order by table_name, index_name, column_name;
+
+TABLE_NAME                                                                      
+--------------------------------------------------------------------------------
+COLUMN_NAME                                                                     
+--------------------------------------------------------------------------------
+INDEX_NAME                                                                      
+--------------------------------------------------------------------------------
+CLIENT                                                                          
+CLIENTID                                                                        
+PK_CLIENT_CLIENTID                                                              
+                                                                                
+COMPTE                                                                          
+COMPTEID                                                                        
+PK_COMPTE_COMPTEID                                                              
+
+TABLE_NAME                                                                      
+--------------------------------------------------------------------------------
+COLUMN_NAME                                                                     
+--------------------------------------------------------------------------------
+INDEX_NAME                                                                      
+--------------------------------------------------------------------------------
+                                                                                
+TRANSACTION                                                                     
+TRANSACTIONID                                                                   
+PK_TRANSACTION_TRID                                                             
+                                                                                
+
+SQL> 
+SQL> -- suppression des indexes posés dans le EXO91
+SQL> 
+SQL> declare
+  2  
+  3  sql_stmt	     varchar2(200);
+  4  cursor c1 is
+  5  	     select index_name
+  6  	     from user_indexes
+  7  	     where table_name in ('CLIENT',  'COMPTE',	'TRANSACTION')
+  8  	     and
+  9  	     (UNIQUENESS = 'NONUNIQUE'
+ 10  		     OR
+ 11  		     (UNIQUENESS='UNIQUE'
+ 12  			     and index_name not in (
+ 13  			     select constraint_name
+ 14  			     from user_constraints
+ 15  			     where constraint_type
+ 16  			     IN ('P', 'U')
+ 17  			     )
+ 18  		     )
+ 19  	     );
+ 20  begin
+ 21  	     for C1_elem in c1
+ 22  	     loop
+ 23  		     sql_stmt:= 'drop index ' || c1_elem.index_name;
+ 24  		     EXECUTE IMMEDIATE sql_stmt;
+ 25  	     end loop;
+ 26  
+ 27  end;
+ 28  /
+
+PL/SQL procedure successfully completed.
+
+SQL> 
+SQL> -- liste des indexes après
+SQL> select table_name, column_name, index_name
+  2  from user_ind_columns
+  3  where table_name in ('CLIENT',  'COMPTE',	'TRANSACTION')
+  4  order by table_name, index_name, column_name;
+
+TABLE_NAME                                                                      
+--------------------------------------------------------------------------------
+COLUMN_NAME                                                                     
+--------------------------------------------------------------------------------
+INDEX_NAME                                                                      
+--------------------------------------------------------------------------------
+CLIENT                                                                          
+CLIENTID                                                                        
+PK_CLIENT_CLIENTID                                                              
+                                                                                
+COMPTE                                                                          
+COMPTEID                                                                        
+PK_COMPTE_COMPTEID                                                              
+
+TABLE_NAME                                                                      
+--------------------------------------------------------------------------------
+COLUMN_NAME                                                                     
+--------------------------------------------------------------------------------
+INDEX_NAME                                                                      
+--------------------------------------------------------------------------------
+                                                                                
+TRANSACTION                                                                     
+TRANSACTIONID                                                                   
+PK_TRANSACTION_TRID                                                             
+                                                                                
+
+SQL> 
+SQL> 
+SQL> --------------------------------------------------------------------------------------------
+SQL> --------------------------------------------------------------------------------------------
+SQL> -- 2. Charger les requêtes dans la table utilisateur user_workload
+SQL> --------------------------------------------------------------------------------------------
+SQL> --------------------------------------------------------------------------------------------
+SQL> 
+SQL> -- Si utile Suppession puis création de la table utilisateur
+SQL> drop table user_workload;
+drop table user_workload
+           *
+ERROR at line 1:
+ORA-00942: table or view "ORS2"."USER_WORKLOAD" does not exist
+Help: https://docs.oracle.com/error-help/db/ora-00942/ 
+
+
+SQL> 
+SQL> 
+SQL> create table user_workload(
+  2  MODULE VARCHAR2(64) ,   --Nom du module applicatif.
+  3  ACTION VARCHAR2(64),    -- Action sur l'application.
+  4  BUFFER_GETS NUMBER default 0, --nbre total de buffer-gets pour la requête.
+  5  CPU_TIME NUMBER default 0, -- Total CPU time in seconds for the statement.
+  6  ELAPSED_TIME NUMBER default 0, -- Total elapsed time in seconds for the statement.
+  7  DISK_READS NUMBER default 0 , --Total number of disk-read operations used
+  8  				     -- by the statement.
+  9  ROWS_PROCESSED NUMBER default 0, --  Total number of rows process by this
+ 10  				     -- SQL statement.
+ 11  EXECUTIONS NUMBER default 1, -- Total number of times the statement is executed.
+ 12  OPTIMIZER_COST NUMBER default  0, -- Optimizer's calculated cost value for
+ 13  					       -- executing the query.
+ 14  LAST_EXECUTION_DATE DATE  default SYSDATE , -- Last time the query is
+ 15  				     -- used. Defaults to not available.
+ 16  PRIORITY NUMBER default 2,      --  Must be one of the following values:
+ 17  				     -- 1- HIGH, 2- MEDIUM, or 3- LOW
+ 18  SQL_TEXT CLOB,	     --  or LONG or VARCHAR2
+ 19  				     -- None The SQL statement. This is a required		     -- column.
+ 20  STAT_PERIOD NUMBER default 1 ,
+ 21  -- Period of time that corresponds to the execution statistics in seconds.
+ 22  USERNAME VARCHAR(30) default user
+ 23  --Current user User submitting the query. This is a required column.
+ 24  );
+
+Table created.
+
+SQL> 
+SQL> 
+SQL> 
+SQL> -- chargement des requêtes dans cette table
+SQL> -- aggregation with selection
+SQL> 
+SQL> INSERT INTO user_workload (username, module, action, priority, sql_text)
+  2  VALUES ('&MYPDBUSER', 'Example1', 'Action', 2,
+  3  ' select cl.clientid, nom, prenom, compteid, typecompte, solde
+  4   from client cl, compte co
+  5   where cl.clientid=co.clientid
+  6   order by clientid , nom')
+  7  /
+old   2: VALUES ('&MYPDBUSER', 'Example1', 'Action', 2,
+new   2: VALUES ('ORS2', 'Example1', 'Action', 2,
+
+1 row created.
+
+SQL> 
+SQL>  -- liste des comptes et clients dont le solde est négatif
+SQL>  INSERT INTO user_workload (username, module, action, priority, sql_text)
+  2  VALUES ('&MYPDBUSER', 'Example2', 'Action', 2,
+  3   'select cl.clientid, nom, prenom, compteid, typecompte, solde
+  4   from client cl, compte co
+  5   where cl.clientid=co.clientid
+  6   and solde <0');
+old   2: VALUES ('&MYPDBUSER', 'Example2', 'Action', 2,
+new   2: VALUES ('ORS2', 'Example2', 'Action', 2,
+
+1 row created.
+
+SQL> 
+SQL> 
+SQL> -- liste des transactions par compte
+SQL> 
+SQL> -- liste des transactions par compte et client
+SQL> INSERT INTO user_workload (username, module, action, priority, sql_text)
+  2  VALUES ('&MYPDBUSER', 'Example3', 'Action', 2,
+  3   'select cl.clientid, nom, prenom, co.compteid, co.typecompte, tr.date_operation,	operation,
+  4   optionoperation, montant
+  5   from client cl, compte co, transaction tr
+  6   where cl.clientid=co.clientid and co.compteid=tr.compteid');
+old   2: VALUES ('&MYPDBUSER', 'Example3', 'Action', 2,
+new   2: VALUES ('ORS2', 'Example3', 'Action', 2,
+
+1 row created.
+
+SQL> 
+SQL> 
+SQL>  -- liste des transactions par compte et client pour lesquels le solde du compte négatif
+SQL>  INSERT INTO user_workload (username, module, action, priority, sql_text)
+  2   VALUES ('&MYPDBUSER', 'Example4', 'Action', 2,
+  3   'select cl.clientid, nom, prenom, co.compteid, co.typecompte, tr.date_operation,	operation,
+  4   optionoperation, montant
+  5   from client cl, compte co, transaction tr
+  6   where cl.clientid=co.clientid and co.compteid=tr.compteid
+  7   and co.solde <0');
+old   2:  VALUES ('&MYPDBUSER', 'Example4', 'Action', 2,
+new   2:  VALUES ('ORS2', 'Example4', 'Action', 2,
+
+1 row created.
+
+SQL> 
+SQL> -- liste des transactions par compte et client connaissant le nom du client
+SQL>  INSERT INTO user_workload (username, module, action, priority, sql_text)
+  2   VALUES ('&MYPDBUSER', 'Example5', 'Action', 2,
+  3   'select cl.clientid, nom, prenom, co.compteid, co.typecompte, tr.date_operation,	operation,
+  4   optionoperation, montant
+  5   from client cl, compte co, transaction tr
+  6   where cl.clientid=co.clientid and co.compteid=tr.compteid
+  7   and cl.nom=''Petit''');
+old   2:  VALUES ('&MYPDBUSER', 'Example5', 'Action', 2,
+new   2:  VALUES ('ORS2', 'Example5', 'Action', 2,
+
+1 row created.
+
+SQL> 
+SQL>  -- liste des transactions par compte et client connaissant le nom du client et opérées à une date donnée
+SQL>  INSERT INTO user_workload (username, module, action, priority, sql_text)
+  2   VALUES ('&MYPDBUSER', 'Example6', 'Action', 2,
+  3   'select cl.clientid, nom, prenom, co.compteid, co.typecompte, tr.date_operation,	operation,
+  4   optionoperation, montant
+  5   from client cl, compte co, transaction tr
+  6   where cl.clientid=co.clientid and co.compteid=tr.compteid
+  7   and cl.nom=''Petit'' and date_operation=to_date(''27-01-2010'', ''DD-MM-YYYY'')');
+old   2:  VALUES ('&MYPDBUSER', 'Example6', 'Action', 2,
+new   2:  VALUES ('ORS2', 'Example6', 'Action', 2,
+
+1 row created.
+
+SQL> 
+SQL>  -- 7ème requête
+SQL>  -- liste des opération d'un client données de type DEBIT
+SQL> INSERT INTO user_workload (username, module, action, priority, sql_text)
+  2   VALUES ('&MYPDBUSER', 'Example7', 'Action', 2,
+  3   'select cl.clientid, nom, prenom, co.compteid, co.typecompte, tr.date_operation,	operation,
+  4   optionoperation, montant
+  5   from client cl, compte co, transaction tr
+  6   where cl.clientid=co.clientid and co.compteid=tr.compteid
+  7   and cl.nom=''Petit'' and operation=''DEBIT''');
+old   2:  VALUES ('&MYPDBUSER', 'Example7', 'Action', 2,
+new   2:  VALUES ('ORS2', 'Example7', 'Action', 2,
+
+1 row created.
+
+SQL> 
+SQL>  -- Erreur 1 : total des transaction par client, par compte, par operation
+SQL> INSERT INTO user_workload (username, module, action, priority, sql_text)
+  2  VALUES ('&MYPDBUSER', 'Example8', 'Action', 2,
+  3   'select cl.clientid,  tr.compteid, operation, sum(montant)
+  4   from client cl, transaction tr, compte co
+  5   where cl.clientid=co.clientid and co.compteid=tr.compteid
+  6   group by cl.clientid,  tr.compteid, operation');
+old   2: VALUES ('&MYPDBUSER', 'Example8', 'Action', 2,
+new   2: VALUES ('ORS2', 'Example8', 'Action', 2,
+
+1 row created.
+
+SQL> 
+SQL>  -- Erreur 2 : total des transaction par client, par compte, par operation
+SQL>  -- dont le total est supérieur à 10000
+SQL>  INSERT INTO user_workload (username, module, action, priority, sql_text)
+  2  VALUES ('&MYPDBUSER', 'Example9', 'Action', 2,
+  3   'select cl.clientid,  tr.compteid, operation, sum(montant)
+  4   from client cl, transaction tr, compte co
+  5   where cl.clientid=co.clientid and co.compteid=tr.compteid
+  6   group by cl.clientid,  tr.compteid, operation
+  7   having sum(montant) >10000');
+old   2: VALUES ('&MYPDBUSER', 'Example9', 'Action', 2,
+new   2: VALUES ('ORS2', 'Example9', 'Action', 2,
+
+1 row created.
+
+SQL> 
+SQL> 
+SQL> -- 10ème balance des transactions par type et par date
+SQL> INSERT INTO user_workload (username, module, action, priority, sql_text)
+  2  VALUES ('&MYPDBUSER', 'Example10', 'Action', 2,
+  3   'select  operation, date_operation, sum(montant)
+  4   from transaction tr
+  5   group by operation, date_operation');
+old   2: VALUES ('&MYPDBUSER', 'Example10', 'Action', 2,
+new   2: VALUES ('ORS2', 'Example10', 'Action', 2,
+
+1 row created.
+
+SQL> 
+SQL> -- balance des transactions par type
+SQL> INSERT INTO user_workload (username, module, action, priority, sql_text)
+  2  VALUES ('&MYPDBUSER', 'Example11', 'Action', 2,
+  3   'select  operation, sum(montant)
+  4   from transaction tr
+  5   group by operation');
+old   2: VALUES ('&MYPDBUSER', 'Example11', 'Action', 2,
+new   2: VALUES ('ORS2', 'Example11', 'Action', 2,
+
+1 row created.
+
+SQL> 
+SQL>  -- balance des transactions par type pour des compte épargne entre deux dates
+SQL>   INSERT INTO user_workload (username, module, action, priority, sql_text)
+  2  VALUES ('&MYPDBUSER', 'Example12', 'Action', 2,
+  3   'select co.typecompte,  operation, sum(montant)
+  4   from client cl, compte co, transaction tr
+  5   where co.compteid=tr.compteid
+  6   and tr.date_operation
+  7   between to_date(''25-01-2010'', ''DD-MM-YYYY'') and to_date(''27-01-2010'', ''DD-MM-YYYY'')
+  8   group by co.typecompte,  operation') ;
+old   2: VALUES ('&MYPDBUSER', 'Example12', 'Action', 2,
+new   2: VALUES ('ORS2', 'Example12', 'Action', 2,
+
+1 row created.
+
+SQL> 
+SQL> 
+SQL>  INSERT INTO user_workload (username, module, action, priority, sql_text)
+  2   VALUES ('&MYPDBUSER', 'Example13', 'Action', 2,
+  3   'select co.typecompte,  operation, sum(montant)
+  4   from client cl, compte co, transaction tr
+  5   where co.compteid=tr.compteid
+  6   and tr.date_operation
+  7   between to_date(''25-01-2010'', ''DD-MM-YYYY'') and to_date(''27-01-2010'', ''DD-MM-YYYY'')
+  8   group by co.typecompte,  operation ');
+old   2:  VALUES ('&MYPDBUSER', 'Example13', 'Action', 2,
+new   2:  VALUES ('ORS2', 'Example13', 'Action', 2,
+
+1 row created.
+
+SQL> 
+SQL>  INSERT INTO user_workload (username, module, action, priority, sql_text)
+  2   VALUES ('&MYPDBUSER', 'Example14', 'Action', 2,
+  3   'select co.typecompte,  operation, sum(montant)
+  4   from compte co, transaction tr
+  5   where co.compteid=tr.compteid
+  6   and tr.date_operation
+  7   between to_date(''25-01-2010'', ''DD-MM-YYYY'') and to_date(''27-01-2010'', ''DD-MM-YYYY'')
+  8   group by co.typecompte,  operation') ;
+old   2:  VALUES ('&MYPDBUSER', 'Example14', 'Action', 2,
+new   2:  VALUES ('ORS2', 'Example14', 'Action', 2,
+
+1 row created.
+
+SQL> 
+SQL> 
+SQL> commit;
+
+Commit complete.
+
+SQL> 
+SQL> 
+SQL> --------------------------------------------------------------------------------------------
+SQL> --------------------------------------------------------------------------------------------
+SQL> -- 3. Analyser les requêtes et produire les recommandations
+SQL> --------------------------------------------------------------------------------------------
+SQL> --------------------------------------------------------------------------------------------
+SQL> 
+SQL> 
+SQL> -- programmation de tache Sql access advisor
+SQL> set serveroutput on
+SQL> 
+SQL> -- fixer les spérateurs de nombre en Anglais. "," pour les décimaux et "." pour les groupes
+SQL> 
+SQL> -- Anglais
+SQL> alter session set NLS_NUMERIC_CHARACTERS = '.,' ;
+
+Session altered.
+
+SQL> 
+SQL> -- Francais
+SQL> -- alter session set NLS_NUMERIC_CHARACTERS = ',.'  ;
+SQL> declare
+  2  saved_stmts NUMBER;
+  3  failed_stmts NUMBER;
+  4  wkld_name VARCHAR2(30) :='WKLD_BANK';
+  5  taskname VARCHAR2(30) := 'TASK_BANK';
+  6  task_id NUMBER;
+  7  num_found NUMBER:=0;
+  8  Begin
+  9  -- détacher la tache et le workload
+ 10  select count(*) into num_found
+ 11  from user_advisor_sqla_wk_map
+ 12  where task_name = taskname and workload_name = wkld_name;
+ 13  IF num_found > 0 THEN
+ 14  DBMS_ADVISOR.RESET_TASK (taskname);
+ 15  DBMS_ADVISOR.DELETE_SQLWKLD_REF(taskname, wkld_name);
+ 16  END IF;
+ 17  
+ 18  -- suppression puis création de la t
+ 19  select count(*) into num_found
+ 20  from dba_advisor_tasks
+ 21  where owner='&MYPDBUSER' and task_name=taskname;
+ 22  
+ 23  IF num_found > 0 THEN
+ 24  DBMS_ADVISOR.DELETE_TASK (taskname);
+ 25  END IF;
+ 26  DBMS_ADVISOR.CREATE_TASK ('SQL Access Advisor', task_id, taskname);
+ 27  
+ 28  -- suppression et puis création du workload
+ 29  select count(*) into num_found
+ 30  from user_advisor_sqlw_sum
+ 31  where workload_name = wkld_name;
+ 32  IF num_found > 0 THEN
+ 33  DBMS_ADVISOR.DELETE_SQLWKLD(workload_name=> wkld_name);
+ 34  END IF;
+ 35  DBMS_ADVISOR.CREATE_SQLWKLD (wkld_name);
+ 36  
+ 37  -- chargement du workload
+ 38  DBMS_ADVISOR.IMPORT_SQLWKLD_USER(
+ 39  workload_name=> wkld_name,import_mode=>'NEW', owner_name=>'&MYPDBUSER',
+ 40  table_name=>'USER_WORKLOAD', Saved_rows=>saved_stmts,
+ 41  Failed_rows=>failed_stmts);
+ 42  dbms_output.put_line(' saved_stmts='||saved_stmts);
+ 43  dbms_output.put_line(' failed_stmts='||failed_stmts);
+ 44  -- Attacher le workload à une tâche
+ 45  /* Link Workload to Task */
+ 46  dbms_advisor.add_sqlwkld_ref(taskname,wkld_name);
+ 47  
+ 48  --Mise à jour de paramètres de la tâche
+ 49  dbms_advisor.set_task_parameter(taskname,'EXECUTION_TYPE','INDEX_ONLY');--'FULL');--'INDEX_ONLY');
+ 50  dbms_advisor.set_task_parameter(taskname,'MODE','COMPREHENSIVE');
+ 51  
+ 52  -- exécuter la tâche
+ 53  DBMS_ADVISOR.EXECUTE_TASK(taskname);
+ 54  Exception
+ 55  When others then
+ 56  dbms_output.put_line(' SQLcode='||sqlcode);
+ 57  dbms_output.put_line(' SQLerrm='||sqlerrm);
+ 58  End;
+ 59  /
+old  21: where owner='&MYPDBUSER' and task_name=taskname;
+new  21: where owner='ORS2' and task_name=taskname;
+old  39: workload_name=> wkld_name,import_mode=>'NEW', owner_name=>'&MYPDBUSER',
+new  39: workload_name=> wkld_name,import_mode=>'NEW', owner_name=>'ORS2',
+saved_stmts=14                                                                  
+failed_stmts=0                                                                  
+
+PL/SQL procedure successfully completed.
+
+SQL> /*
+SQL> *
+SQL> ERREUR à la ligne 1 :
+SQL> ORA-13600: erreur survenue dans Advisor
+SQL> ORA-13635: La valeur indiquée pour le paramètre ADJUSTED_SCALEUP_GREEN_THRESH
+SQL> ne peut pas être convertie en nombre.
+SQL> ORA-06512: à "SYS.PRVT_ADVISOR", ligne 3902
+SQL> ORA-06512: à "SYS.DBMS_ADVISOR", ligne 102
+SQL> ORA-06512: à ligne 26
+SQL> */
+SQL> 
+SQL> -- ALTER SYSTEM SET NLS_TERRITORY=FRANCE scope=spfile;
+SQL> 
+SQL> -- si cette apparait faire les  actions suivantes
+SQL> -- Ne pas lancer les deux programmes qui suivent
+SQL> -- si pas d'erreur
+SQL> 
+SQL> /*
+SQL> -- ne pas exécuter ce script si pas d'erreur plus haut
+SQL> declare
+SQL> template_id NUMBER;
+SQL> template_name VARCHAR2(255):= 'MY_TEMPLATE';
+SQL> Begin
+SQL> DBMS_ADVISOR.SET_DEFAULT_TASK_PARAMETER (
+SQL> 'SQL Access Advisor',
+SQL> 'ADJUSTED_SCALEUP_GREEN_THRESH'  ,
+SQL> '1,25' -- au lieu de 1.25
+SQL> );
+SQL> end;
+SQL> /
+SQL> 
+SQL> -- ne pas exécuter ce script si pas d'erreur plus haut
+SQL> declare
+SQL> template_id NUMBER;
+SQL> template_name VARCHAR2(255):= 'MY_TEMPLATE';
+SQL> Begin
+SQL> DBMS_ADVISOR.SET_DEFAULT_TASK_PARAMETER (
+SQL> 'SQL Access Advisor',
+SQL> 'OVERALL_SCALEUP_GREEN_THRESH'  ,
+SQL> '1,5' -- au lieu de 1.5
+SQL> );
+SQL> end;
+SQL> /
+SQL> 
+SQL> */
+SQL> 
+SQL> --------------------------------------------------------------------------------------------
+SQL> --------------------------------------------------------------------------------------------
+SQL> -- 4. Consulter les recommandations
+SQL> --------------------------------------------------------------------------------------------
+SQL> --------------------------------------------------------------------------------------------
+SQL> 
+SQL> -- Consulter les requêtes de référence que va régler SAA
+SQL> col WORKLOAD_NAME format a20
+SQL> col SQL_TEXT format a70
+SQL> set linesize 200
+SQL> set pagesize 400
+SQL> select WORKLOAD_NAME, sql_id, SQL_TEXT from DBA_ADVISOR_SQLW_STMTS
+  2  Where workload_name= 'WKLD_BANK'
+  3  order by sql_id;
+
+WORKLOAD_NAME            SQL_ID SQL_TEXT                                                                                                                                                                
+-------------------- ---------- ----------------------------------------------------------------------                                                                                                  
+WKLD_BANK                     1  select cl.clientid, nom, prenom, compteid, typecompte, sold                                                                                                            
+                                e                                                                                                                                                                       
+                                 from client cl, c                                                                                                                                                      
+                                                                                                                                                                                                        
+WKLD_BANK                     2 select cl.clientid, nom, prenom, compteid, typecompte, solde                                                                                                            
+                                                                                                                                                                                                        
+                                 from client cl, co                                                                                                                                                     
+                                                                                                                                                                                                        
+WKLD_BANK                     3 select cl.clientid, nom, prenom, co.compteid, co.typecompte,                                                                                                            
+                                 tr.date_operation,                                                                                                                                                     
+                                                                                                                                                                                                        
+WKLD_BANK                     4 select cl.clientid, nom, prenom, co.compteid, co.typecompte,                                                                                                            
+                                 tr.date_operation,                                                                                                                                                     
+                                                                                                                                                                                                        
+WKLD_BANK                     5 select cl.clientid, nom, prenom, co.compteid, co.typecompte,                                                                                                            
+                                 tr.date_operation,                                                                                                                                                     
+                                                                                                                                                                                                        
+WKLD_BANK                     6 select cl.clientid, nom, prenom, co.compteid, co.typecompte,                                                                                                            
+                                 tr.date_operation,                                                                                                                                                     
+                                                                                                                                                                                                        
+WKLD_BANK                     7 select cl.clientid, nom, prenom, co.compteid, co.typecompte,                                                                                                            
+                                 tr.date_operation,                                                                                                                                                     
+                                                                                                                                                                                                        
+WKLD_BANK                     8 select cl.clientid,  tr.compteid, operation, sum(montant)                                                                                                               
+                                 from client cl, trans                                                                                                                                                  
+                                                                                                                                                                                                        
+WKLD_BANK                     9 select cl.clientid,  tr.compteid, operation, sum(montant)                                                                                                               
+                                 from client cl, trans                                                                                                                                                  
+                                                                                                                                                                                                        
+WKLD_BANK                    10 select  operation, date_operation, sum(montant)                                                                                                                         
+                                 from transaction tr                                                                                                                                                    
+                                 group by o                                                                                                                                                             
+                                                                                                                                                                                                        
+WKLD_BANK                    11 select  operation, sum(montant)                                                                                                                                         
+                                 from transaction tr                                                                                                                                                    
+                                 group by operation                                                                                                                                                     
+                                                                                                                                                                                                        
+WKLD_BANK                    12 select co.typecompte,  operation, sum(montant)                                                                                                                          
+                                 from client cl, compte co, trans                                                                                                                                       
+                                                                                                                                                                                                        
+WKLD_BANK                    13 select co.typecompte,  operation, sum(montant)                                                                                                                          
+                                 from client cl, compte co, trans                                                                                                                                       
+                                                                                                                                                                                                        
+WKLD_BANK                    14 select co.typecompte,  operation, sum(montant)                                                                                                                          
+                                 from compte co, transaction tr                                                                                                                                         
+                                                                                                                                                                                                        
+                                                                                                                                                                                                        
+
+14 rows selected.
+
+SQL> 
+SQL> 
+SQL> -- Visualisation des recommandations
+SQL> -- Affiche du nr de recommandation, le rang et le bénéfice de
+SQL> -- la recommandation
+SQL> 
+SQL> SELECT REC_ID, RANK, BENEFIT, type
+  2  FROM USER_ADVISOR_RECOMMENDATIONS WHERE TASK_NAME = 'TASK_BANK';
+
+    REC_ID       RANK    BENEFIT TYPE                                                                                                                                                                   
+---------- ---------- ---------- ------------------------------                                                                                                                                         
+         1          1        108 ACTIONS                                                                                                                                                                
+         2          2       2358 ACTIONS                                                                                                                                                                
+         3          3       1156 ACTIONS                                                                                                                                                                
+         4          4         53 ACTIONS                                                                                                                                                                
+         5          5       1024 ACTIONS                                                                                                                                                                
+         6          6        133 ACTIONS                                                                                                                                                                
+
+6 rows selected.
+
+SQL> 
+SQL> -- Visualisation des recommandations
+SQL> -- Afficher des recommandations et des bénéfices
+SQL> -- par requêtes
+SQL> 
+SQL> SELECT sql_id, rec_id, precost, postcost,
+  2  (precost-postcost)*100/precost AS percent_benefit
+  3  FROM USER_ADVISOR_SQLA_WK_STMTS
+  4  WHERE TASK_NAME = 'TASK_BANK'
+  5  AND workload_name = 'WKLD_BANK';
+
+no rows selected
+
+SQL> 
+SQL> -- Visualisation des recommandations
+SQL> -- Affichage des actions recommandés :
+SQL> -- Comptage des actions recommandées
+SQL> 
+SQL> 
+SQL> SELECT 'Action Count', COUNT(DISTINCT action_id) cnt
+  2  FROM user_advisor_actions
+  3  WHERE task_name = 'TASK_BANK';
+
+'ACTIONCOUNT        CNT                                                                                                                                                                                 
+------------ ----------                                                                                                                                                                                 
+Action Count          7                                                                                                                                                                                 
+
+SQL> 
+SQL> 
+SQL> 
+SQL> -- Visualisation des recommandations
+SQL> -- Affichage des actions recommandés :
+SQL> -- Liste des actions recommandées
+SQL> 
+SQL> 
+SQL> Col command format A30
+SQL> Col attr1 format A40
+SQL> Set long 500
+SQL> SELECT rec_id, action_id, command, attr1
+  2  FROM user_advisor_actions
+  3  WHERE task_name = 'TASK_BANK'
+  4  ORDER BY rec_id, action_id;
+
+    REC_ID  ACTION_ID COMMAND                        ATTR1                                                                                                                                              
+---------- ---------- ------------------------------ ----------------------------------------                                                                                                           
+         1          1 RETAIN INDEX                   "ORS2"."PK_CLIENT_CLIENTID"                                                                                                                        
+         1          3 CREATE INDEX                   "ORS2"."TRANSACTION_IDX$$_009F0000"                                                                                                                
+         2          4 CREATE INDEX                   "ORS2"."CLIENT_IDX$$_009F0001"                                                                                                                     
+         2          5 CREATE INDEX                   "ORS2"."COMPTE_IDX$$_009F0002"                                                                                                                     
+         2          6 CREATE INDEX                   "ORS2"."TRANSACTION_IDX$$_009F0003"                                                                                                                
+         3          1 RETAIN INDEX                   "ORS2"."PK_CLIENT_CLIENTID"                                                                                                                        
+         3          6 CREATE INDEX                   "ORS2"."TRANSACTION_IDX$$_009F0003"                                                                                                                
+         3          7 CREATE INDEX                   "ORS2"."COMPTE_IDX$$_009F0004"                                                                                                                     
+         4          3 CREATE INDEX                   "ORS2"."TRANSACTION_IDX$$_009F0000"                                                                                                                
+         5          1 RETAIN INDEX                   "ORS2"."PK_CLIENT_CLIENTID"                                                                                                                        
+         5          2 RETAIN INDEX                   "ORS2"."PK_COMPTE_COMPTEID"                                                                                                                        
+         5          3 CREATE INDEX                   "ORS2"."TRANSACTION_IDX$$_009F0000"                                                                                                                
+         6          1 RETAIN INDEX                   "ORS2"."PK_CLIENT_CLIENTID"                                                                                                                        
+         6          7 CREATE INDEX                   "ORS2"."COMPTE_IDX$$_009F0004"                                                                                                                     
+
+14 rows selected.
+
+SQL> 
+SQL> 
+SQL> -- Visualisation des recommandations
+SQL> -- Génération des scripts SQL
+SQL> -- Afin d'implémenter les recommandations il est possible de
+SQL> -- générer des scripts
+SQL> 
+SQL> -- La fonction GET_TASK_SCRIPT construire le script
+SQL> set serveroutput on
+SQL> begin
+  2  dbms_output.put_line(DBMS_ADVISOR.GET_TASK_SCRIPT('TASK_BANK'));
+  3  end;
+  4  /
+Rem  SQL Access Advisor: Version 23.0.0.0.0 - Production
+Rem  
+Rem  Username:        ORS2
+Rem  Task:            TASK_BANK
+Rem  Execution date:  28/03/2026 05:32
+Rem  
+
+/* RETAIN INDEX                 
+"ORS2"."PK_CLIENT_CLIENTID" */
+
+/* RETAIN INDEX "ORS2"."PK_COMPTE_COMPTEID" */
+
+CREATE BITMAP INDEX "ORS2"."TRANSACTION_IDX$$_009F0000"
+    ON "ORS2"."TRANSACTION"
+    ("DATE_OPERATION")
+    COMPUTE  
+STATISTICS;
+
+CREATE INDEX "ORS2"."CLIENT_IDX$$_009F0001"
+    ON "ORS2"."CLIENT"
+    ("NOM")
+    COMPUTE STATISTICS;
+
+CREATE INDEX "ORS2"."COMPTE_IDX$$_009F0002"
+    ON "ORS2"."COMPTE"
+               
+
+("CLIENTID")
+    COMPUTE STATISTICS;
+
+CREATE INDEX "ORS2"."TRANSACTION_IDX$$_009F0003"
+    ON "ORS2"."TRANSACTION"
+    ("COMPTEID")
+    COMPUTE STATISTICS;
+
+CREATE INDEX                               
+"ORS2"."COMPTE_IDX$$_009F0004"
+    ON "ORS2"."COMPTE"
+    ("SOLDE")
+    COMPUTE STATISTICS;
+
+                                                                                                         
+
+
+
+PL/SQL procedure successfully completed.
+
+SQL> 
+SQL> -- La fonction CREATE_FILE permet de créer le fichier
+SQL> -- contenant le script
+SQL> declare
+  2  mydate varchar2(20):=to_char(sysdate, 'DD_MM_YYYY_HH24_MI_SS');
+  3  fname varchar2(300):='SAA_Generate_script_on_bank_app_'||mydate||'.sql';
+  4  begin
+  5  dbms_output.put_line(fname);
+  6  DBMS_ADVISOR.CREATE_FILE(
+  7  buffer=>DBMS_ADVISOR.GET_TASK_SCRIPT('TASK_BANK'),
+  8  location =>'DATA_PUMP_DIR',
+  9   filename=>fname
+ 10  );
+ 11  end;
+ 12  /
+SAA_Generate_script_on_bank_app_28_03_2026_05_32_54.sql                                                                                                                                                 
+
+PL/SQL procedure successfully completed.
+
+SQL> 
+SQL> spool off
